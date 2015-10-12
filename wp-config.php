@@ -20,13 +20,20 @@
 
 // ** MySQL 设置 - 具体信息来自您正在使用的主机 ** //
 /** WordPress数据库的名称 */
-define('DB_NAME', 'wordpress');
+define('DEVELOP', true);
+//如果域名不带toucanz或服务器IP地址，则为开发模式
+if( strpos($_SERVER["HTTP_HOST"],"toucanz") || strpos($_SERVER["HTTP_HOST"],"120.25.254.43")){
+	define('DEVELOP', false);
+}
+
+
+define('DB_NAME', DEVELOP?'wordpress':'wordpress');
 
 /** MySQL数据库用户名 */
-define('DB_USER', 'wordpress');
+define('DB_USER', DEVELOP?'root':'wordpress');
 
 /** MySQL数据库密码 */
-define('DB_PASSWORD', 'st4n8Enb8BuNRWdB');
+define('DB_PASSWORD', DEVELOP?'123456':'st4n8Enb8BuNRWdB');
 
 /** MySQL主机 */
 define('DB_HOST', 'localhost');
