@@ -20,11 +20,10 @@
 
 // ** MySQL 设置 - 具体信息来自您正在使用的主机 ** //
 /** WordPress数据库的名称 */
-define('DEVELOP', true);
+
 //如果域名不带toucanz或服务器IP地址，则为开发模式
-if( strpos($_SERVER["HTTP_HOST"],"toucanz") || strpos($_SERVER["HTTP_HOST"],"120.25.254.43")){
-	define('DEVELOP', false);
-}
+$develop = !(strpos(strtolower($_SERVER["HTTP_HOST"]),"toucanz") || strpos($_SERVER["HTTP_HOST"],"120.25.254.43"));
+define('DEVELOP', $develop);
 
 
 define('DB_NAME', DEVELOP?'wordpress':'wordpress');
