@@ -3,10 +3,9 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
-	RewriteCond %{HTTP_HOST} ^toucanz.com/ [NC]
-	RewriteRule ^(.*)$ http://www.toucanz.com$1 [L,R=301]
-
-	RewriteCond %{HTTP_HOST} ^blog.toucanz.com/ [NC]
+	RewriteCond %{HTTP_HOST} ^toucanz.com [NC]
+	RewriteCond %{HTTP_HOST} ^blog.toucanz.com [NC]
+	RewriteCond %{HTTP_HOST} ^120.25.254.43 [NC]
 	RewriteRule ^(.*)$ http://www.toucanz.com$1 [L,R=301]
 
 	RewriteBase /
