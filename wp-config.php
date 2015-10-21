@@ -22,9 +22,8 @@
 /** WordPress数据库的名称 */
 
 //如果域名不带toucanz或服务器IP地址，则为开发模式
-$develop = !(strpos(strtolower($_SERVER["HTTP_HOST"]),"toucanz") || strpos($_SERVER["HTTP_HOST"],"120.25.254.43"));
+$develop = !(strpos(strtolower($_SERVER["HTTP_HOST"]),"toucanz")!==false || strpos($_SERVER["HTTP_HOST"],"120.25.254.43")!==false);
 define('DEVELOP', $develop);
-
 
 define('DB_NAME', DEVELOP?'wordpress':'wordpress');
 
