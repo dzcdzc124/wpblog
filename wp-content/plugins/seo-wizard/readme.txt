@@ -1,16 +1,31 @@
 ﻿=== SEO ===
-Contributors: Seo UK Team
-Donate link: http://seo.uk.net
-Tags: seo, page, pages, post, posts, plugin, 404, nofollow, google, widget, meta, sitemap, sitemaps, robots, rss, yahoo, bing, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, analysis, score, snippets, facebook, twitter, author
+Contributors: theseowizards
+Donate link: http://www.seowizard.org/
+Tags: seo, deeplink, juggernaut, htaccess, robots.txt, analysis, redirect, automatic, link, links, page, pages, post, posts, plugin, 404, nofollow, google, widget, meta, sitemap, sitemaps, robots, rss, yahoo, bing, multisite, canonical, nofollow, noindex, keywords, meta keywords, description, webmaster tools, google webmaster tools, analysis, score, snippets, facebook, twitter, author
 Requires at least: 3.8
-Tested up to: 4.3
-Stable tag: 3.0.4
+Tested up to: 4.5
+Stable tag: 4.0.0
 
-SEO Wizard helps you write better content, write optimized meta titles and descriptions, integrate social media, view post/page analysis and much more!
+SEO Wizard is an all-in-one seo solution. Post/page analysis, social media, link juggernaut, auto linking, 404 monitor, redirects, robots.txt & htaccess editor & more!
 
 == Description ==
 
-SEO Wizard is one of the most coveted WordPress plugins because of the flexibility it offers its users. The tool helps designers write better content, keep track of posts, write optimized meta titles and descriptions, and integrate social media. It's a comprehensive plugin that's proving its worth in the wordpress community. 
+The <a href="http://www.seowizard.org/" title="Seo Wizard - The Wordpress Seo Wizards!" target="_blank">SEO Wizard (SeoWizard.org)</a> is one of the most coveted WordPress plugins because of the flexibility it offers its users. The tool helps designers write better content, keep track of posts, write optimized meta titles and descriptions, and integrate social media. It's a comprehensive plugin that's proving its worth in the wordpress community. 
+
+= New added modules ( 18 April 2016) =
+
+* 404 Monitor
+* Deeplink Juggernaut (Auto-linking)
+* Redirect Manager
+* Htaccess editor
+* Robots.txt editor
+
+= New added features (7 April 2016) =
+
+* Dynamic Homepage SEO Settings
+* Webmaster Verification for Google & Bing
+
+Please send us any suggestions for new modules & features by <a href="http://www.seowizard.org/contact/">contacting us</a>.
 
 = Here's what you can expect of SEO Wizard if you plan to use it. =
 
@@ -40,8 +55,6 @@ Social media tools are helpful for getting numerous followers and likes to a pag
 
 = How We Can Help =
 
-Professionals at Seo.uk.net can help with any problems that may occur with SEO Wizard.
-
 We are dedicated to customer satisfaction and will spend hours performing research to ensure that the plugin performs to the best of its ability. For the most part, their SEO services are highly effective and will help your company grow. 
 
 We provide exceptional support, and they are skilled at keeping their customers informed of the latest updates and improvements. They offer a variety of support packages that will help customers meet their needs. These packages range in price also. So, they'll meet a variety of budget types. A representative can help you identify the best package for you. 
@@ -52,7 +65,7 @@ If you want to improve your company's website traffic or exposure, the SEO Wizar
 
 Get the SEO Wizard WordPress Plugin to Improve Your Website Seo absolytely free of charge!
 
-Do you have questions? Please contact us at http://seo.uk.net/contact-us/
+For plugin support please create a ticket here: http://www.seowizard.org/support/ with any questions or inquiries you may have.
 
 == Installation ==
 
@@ -72,6 +85,13 @@ Do you have questions? Please contact us at http://seo.uk.net/contact-us/
 8. Social Seo
 9. Page Analysis
 10. Noindex / Nofollow
+11. 404 Monitor - Settings
+12. Content Links - Juggernaut
+13. Content Link Settings - Juggernaut
+14. Footer Links - Juggernaut
+15. Footer Links settings - Juggernaut
+16. Auto Link Settings
+17. Noindex-nofollow settings
 
 == Changelog ==
 

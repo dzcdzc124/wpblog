@@ -466,7 +466,7 @@ if (!class_exists('WSW_HtmlStyles')) {
          */
         static function add_rel_nofollow_image_links($content,$settings) {
         	
-        	if ($settings['auto_add_rel_nofollow_img_links']==='1') {
+        	if (array_key_exists('auto_add_rel_nofollow_img_links' , $settings) && $settings['auto_add_rel_nofollow_img_links']==='1') {
         		
         		// Go through all links tags and check if is external with do follow, then add the nofollow
         		$matches = array();

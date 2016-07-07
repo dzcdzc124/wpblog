@@ -47,12 +47,12 @@ if ( ! class_exists( 'WSW_Settings' ) ) {
 
             // default values
             $options = array (
-                'chk_keyword_to_titles' => '0',
+                'chk_keyword_to_titles' => '1',
                 'chk_nofollow_in_external' => '0',
                 'chk_nofollow_in_image' => '0',
                 'chk_use_facebook' => '0',
                 'chk_use_twitter' => '0',
-                'chk_use_richsnippets' => '0',
+                'chk_use_richsnippets' => '1',
 
                 'chk_keyword_decorate_bold' => '0',
                 'chk_keyword_decorate_italic' => '0',
@@ -79,9 +79,20 @@ if ( ! class_exists( 'WSW_Settings' ) ) {
                 'chk_block_login_page' => '0',
                 'chk_block_admin_page' => '0',
 
-                'chk_use_meta_robot' => '0',
+                'chk_use_meta_robot' => '1',
                 'chk_tweak_permalink' => '0',
-                'chk_make_sitemap' => '0'
+                'chk_make_sitemap' => '0',
+                'wsw_set_time_check'=>'0',
+                'anchor_text'=>'',
+                /***************** for homepage default settings **********************/
+                'chk_homepage_static' => '1',
+                'wsw_homepage_title' => '',
+                'wsw_homepage_desc' => '',
+                'wsw_homepage_keywords' => '',
+                /*******************  for webmaster tools *****************************/
+                'wsw_webmaster_content' => '',
+                'wsw_bing_webmaster' => '',
+                'wsw_pinterest_verify' => ''
             );
 
 

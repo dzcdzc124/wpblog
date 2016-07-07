@@ -28,17 +28,17 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
          */
         public function register_hook_callbacks() {
 
-            add_action('admin_menu',                        __CLASS__ . '::register_settings_pages' );
+            add_action('admin_menu',                        array($this,'register_settings_pages') );
 
-            add_filter('manage_posts_columns',              __CLASS__ . '::handle_add_columns', 10, 2);
-            add_filter('manage_pages_columns',              __CLASS__ . '::handle_add_columns', 10, 2);
+            add_filter('manage_posts_columns',              array($this,'handle_add_columns'), 10, 2);
+            add_filter('manage_pages_columns',              array($this,'handle_add_columns'), 10, 2);
 
-            add_action('manage_posts_custom_column',        __CLASS__ . '::handle_show_columns_values', 10, 2);
-            add_action('manage_pages_custom_column',        __CLASS__ . '::handle_show_columns_values', 10, 2);
+            add_action('manage_posts_custom_column',       array($this,'handle_show_columns_values'), 10, 2);
+            add_action('manage_pages_custom_column',        array($this,'handle_show_columns_values'), 10, 2);
 
-            add_action('seowizard_sitemap_event', __CLASS__ . '::generate_sitemap_cron');
+            add_action('seowizard_sitemap_event', array($this,'generate_sitemap_cron'));
 
-            add_action( 'template_redirect', __CLASS__ . '::log_404s'  );
+            add_action( 'template_redirect', array($this, 'log_404s' ) );
         }
 
         function log_404s () {
@@ -71,30 +71,9 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
          * http://stackoverflow.com/questions/2354633/wordpress-root-directory
          */
 
-        function get_sitemap_location() {
+       static function get_sitemap_location() {
 
-            $base = dirname(__FILE__);
-
-            $path = false;
-            if (@file_exists(dirname(dirname(dirname($base)))."/wp-config.php"))
-            {
-                $path = dirname(dirname(dirname($base)))."/sitemap.xml";
-            }
-            else{
-                if (@file_exists(dirname(dirname(dirname(dirname($base))))."/wp-config.php"))
-                {
-                    $path = dirname(dirname(dirname(dirname($base))))."/sitemap.xml";
-                }
-                else
-                    $path = false;
-            }
-
-            if ($path != false)
-            {
-                $path = str_replace("\\", "/", $path);
-            }
-
-
+           $path=get_home_path()."/sitemap.xml";
             return $path;
 
         } // end get_sitemap_location
@@ -103,7 +82,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
          *
          * @handle	The resource used to write data to disk.
          */
-        function write_sitemap_header($handle) {
+       static function write_sitemap_header($handle) {
 
             $sitemap = '<?xml version="1.0" encoding="' . get_bloginfo('charset') . '"?>';
             $sitemap .= "\n";
@@ -120,7 +99,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         /**
          * Creates a gzip archive of the sitemap and writes it to disk.
          */
-        function gzip_sitemap() {
+        static function gzip_sitemap() {
 
             $handle = fopen(self::get_sitemap_location() . '.gz', 'w');
             $sitemap = implode("", file(self::get_sitemap_location()));
@@ -280,10 +259,8 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         function handle_show_columns_values($column_name, $post_id) {
             try {
                 $settings = get_post_meta( $post_id , 'wsw-settings');
-
                 if(isset($settings)){
-                    $keywords = $settings[0]['keyword_value'];
-
+                    $keywords = isset( $settings[0]['keyword_value'] ) ? $settings[0]['keyword_value'] : '';
                     $post    = get_post( $post_id );
                     $post_content = $post->post_content;
 
@@ -313,9 +290,11 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         /**
          * Adds pages to the Admin Panel menu
          */
-        public function register_settings_pages() {
+        public static function register_settings_pages() {
 
             $hook = add_menu_page(WSW_NAME . ' Settings', WSW_NAME , 'manage_options', self::page_id, __CLASS__ . '::markup_dashboard_page');
+             add_submenu_page(self::page_id,WSW_NAME . ' Settings','General','manage_options',self::page_id);
+            //$submenu[self::page_id][0][0]='Dashboard';
             //  $hook = add_submenu_page(self::page_id, 'Dashboard', 'Dashboard', 'manage_options',self::page_id, __CLASS__ . '::markup_dashboard_page');
 
             add_action( 'admin_print_scripts-' . $hook, __CLASS__ . '::enqueue_scripts');
@@ -334,7 +313,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         /**
          * enqueue scripts of plugin
          */
-        function enqueue_scripts()
+      public static function enqueue_scripts()
         {
 
         }
@@ -342,7 +321,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         /**
          * enqueue style sheets of plugin
          */
-        function enqueue_styles()
+       public static function enqueue_styles()
         {
 
             wp_enqueue_script( 'jquery-ui-core' );
@@ -369,7 +348,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         /**
          * Creates the markup for the Dashboard page
          */
-        public function markup_dashboard_page() {
+        public static function markup_dashboard_page() {
 
             WSW_Main::markup_settings_header();
             if ( current_user_can( WSW_Main::REQUIRED_CAPABILITY ) ) {
@@ -412,16 +391,27 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
                 $variables['chk_block_admin_page'] = WSW_Main::$settings['chk_block_admin_page'];
                 $variables['lsi_bing_api_key'] = WSW_Main::$settings['lsi_bing_api_key'];
                 $variables['first_tab'] = 'tab1';
+                /*****************************  for homepage settings *********************************/
+                $variables['chk_homepage_static'] = WSW_Main::$settings['chk_homepage_static'];
+                $variables['wsw_homepage_title'] = WSW_Main::$settings['wsw_homepage_title'];
+                $variables['wsw_homepage_desc'] = WSW_Main::$settings['wsw_homepage_desc'];
+                $variables['wsw_homepage_keywords'] = WSW_Main::$settings['wsw_homepage_keywords'];
+                /**************************************************************************************/
+                /***************************** for webmaster tools ************************************/
+                $variables['wsw_webmaster_content'] = WSW_Main::$settings['wsw_webmaster_content'];
+                $variables['wsw_bing_webmaster'] = WSW_Main::$settings['wsw_bing_webmaster'];
+                $variables['wsw_pinterest_verify'] = WSW_Main::$settings['wsw_pinterest_verify'];
+                /**************************************************************************************/
 
-                if($_GET['action'] == 'Trash'){
+                if(isset($_GET['action']) && $_GET['action'] == 'Trash'){
                     WSW_Model_Log::remove_record($_GET['book']);
                     $variables['first_tab'] = 'tab4';
-                }else if($_GET['paged']){
+                }else if(isset($_GET['paged'])){
 
                     $variables['first_tab'] = 'tab4';
                 }
 
-                if($_POST['page'] == 'wsw_log_404'){
+                if( isset($_POST['page']) && $_POST['page'] == 'wsw_log_404'){
 
                     if($_POST['log404']){
                         foreach( $_POST['log404'] as $log404 ){
@@ -444,42 +434,50 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         static public function ajax_save_global_settings(){
 
             $options = WSW_Main::$settings;
+            check_ajax_referer('wsw-global-ajax-nonce' , 'security' , false);
+            if(isset($_POST['chk_keyword_to_titles']) && !is_null($_POST['chk_keyword_to_titles'])) $options['chk_keyword_to_titles'] =$_POST['chk_keyword_to_titles'];
+            if(isset($_POST['chk_tweak_permalink']) && !is_null($_POST['chk_tweak_permalink'])) $options['chk_tweak_permalink'] =$_POST['chk_tweak_permalink'];
+            if(isset($_POST['chk_nofollow_in_external']) && !is_null($_POST['chk_nofollow_in_external'])) $options['chk_nofollow_in_external'] =$_POST['chk_nofollow_in_external'];
+            if(isset($_POST['chk_nofollow_in_image']) && !is_null($_POST['chk_nofollow_in_image'])) $options['chk_nofollow_in_image'] = $_POST['chk_nofollow_in_image'];
+            if(isset($_POST['chk_use_facebook']) && !is_null($_POST['chk_use_facebook'])) $options['chk_use_facebook'] = $_POST['chk_use_facebook'];
+            if(isset($_POST['chk_use_twitter']) && !is_null($_POST['chk_use_twitter'])) $options['chk_use_twitter'] = $_POST['chk_use_twitter'];
+            if(isset($_POST['chk_use_meta_robot']) && !is_null($_POST['chk_use_meta_robot'])) $options['chk_use_meta_robot'] = $_POST['chk_use_meta_robot'];
+            if(isset($_POST['chk_use_richsnippets']) && !is_null($_POST['chk_use_richsnippets'])) $options['chk_use_richsnippets'] = $_POST['chk_use_richsnippets'];
+            if(isset($_POST['chk_author_linking']) && !is_null($_POST['chk_author_linking'])) $options['chk_author_linking'] = $_POST['chk_author_linking'];
+
+            if(isset($_POST['chk_keyword_decorate_bold']) && !is_null($_POST['chk_keyword_decorate_bold'])) $options['chk_keyword_decorate_bold'] = $_POST['chk_keyword_decorate_bold'];
+            if(isset($_POST['chk_keyword_decorate_italic']) && !is_null($_POST['chk_keyword_decorate_italic'])) $options['chk_keyword_decorate_italic'] = $_POST['chk_keyword_decorate_italic'];
+            if(isset($_POST['chk_keyword_decorate_underline']) && !is_null($_POST['chk_keyword_decorate_underline'])) $options['chk_keyword_decorate_underline'] = $_POST['chk_keyword_decorate_underline'];
+            if(isset($_POST['chk_make_sitemap']) && !is_null($_POST['chk_make_sitemap'])) $options['chk_make_sitemap'] =$_POST['chk_make_sitemap'];
+
+            if(isset($_POST['opt_keyword_decorate_bold_type']) && !is_null($_POST['opt_keyword_decorate_bold_type'])) $options['opt_keyword_decorate_bold_type'] = $_POST['opt_keyword_decorate_bold_type'];
+            if(isset($_POST['opt_keyword_decorate_italic_type']) && !is_null($_POST['opt_keyword_decorate_italic_type'])) $options['opt_keyword_decorate_italic_type'] =$_POST['opt_keyword_decorate_italic_type'];
+            if(isset($_POST['opt_keyword_decorate_underline_type']) && !is_null($_POST['opt_keyword_decorate_underline_type'])) $options['opt_keyword_decorate_underline_type'] =$_POST['opt_keyword_decorate_underline_type'];
+
+            if(isset($_POST['opt_image_alternate_type']) && !is_null($_POST['opt_image_alternate_type'])) $options['opt_image_alternate_type'] =$_POST['opt_image_alternate_type'];
+            if(isset($_POST['opt_image_title_type']) && !is_null($_POST['opt_image_title_type'])) $options['opt_image_title_type'] = $_POST['opt_image_title_type'];
+            if(isset($_POST['txt_image_alternate']) && !is_null($_POST['txt_image_alternate'])) $options['txt_image_alternate'] = sanitize_text_field($_POST['txt_image_alternate']);
+            if(isset($_POST['txt_image_title']) && !is_null($_POST['txt_image_title'])) $options['txt_image_title'] = sanitize_text_field($_POST['txt_image_title']);
+
+            if(isset($_POST['txt_generic_tags']) && !is_null($_POST['txt_generic_tags'])) $options['txt_generic_tags'] = sanitize_text_field($_POST['txt_generic_tags']);
+            if(isset($_POST['chk_tagging_using_google']) && !is_null($_POST['chk_tagging_using_google'])) $options['chk_tagging_using_google'] = $_POST['chk_tagging_using_google'];
 
 
-            if(!is_null($_POST['chk_keyword_to_titles'])) $options['chk_keyword_to_titles'] = $_POST['chk_keyword_to_titles'];
+            if(isset($_POST['chk_block_login_page']) && !is_null($_POST['chk_block_login_page'])) $options['chk_block_login_page'] = $_POST['chk_block_login_page'];
+            if(isset($_POST['chk_block_admin_page']) && !is_null($_POST['chk_block_admin_page'])) $options['chk_block_admin_page'] = $_POST['chk_block_admin_page'];
 
-            if(!is_null($_POST['chk_tweak_permalink'])) $options['chk_tweak_permalink'] = $_POST['chk_tweak_permalink'];
-            if(!is_null($_POST['chk_nofollow_in_external'])) $options['chk_nofollow_in_external'] = $_POST['chk_nofollow_in_external'];
-            if(!is_null($_POST['chk_nofollow_in_image'])) $options['chk_nofollow_in_image'] = $_POST['chk_nofollow_in_image'];
-            if(!is_null($_POST['chk_use_facebook'])) $options['chk_use_facebook'] = $_POST['chk_use_facebook'];
-            if(!is_null($_POST['chk_use_twitter'])) $options['chk_use_twitter'] = $_POST['chk_use_twitter'];
-            if(!is_null($_POST['chk_use_meta_robot'])) $options['chk_use_meta_robot'] = $_POST['chk_use_meta_robot'];
-            if(!is_null($_POST['chk_use_richsnippets'])) $options['chk_use_richsnippets'] = $_POST['chk_use_richsnippets'];
-            if(!is_null($_POST['chk_author_linking'])) $options['chk_author_linking'] = $_POST['chk_author_linking'];
-
-            if(!is_null($_POST['chk_keyword_decorate_bold'])) $options['chk_keyword_decorate_bold'] = $_POST['chk_keyword_decorate_bold'];
-            if(!is_null($_POST['chk_keyword_decorate_italic'])) $options['chk_keyword_decorate_italic'] = $_POST['chk_keyword_decorate_italic'];
-            if(!is_null($_POST['chk_keyword_decorate_underline'])) $options['chk_keyword_decorate_underline'] = $_POST['chk_keyword_decorate_underline'];
-            if(!is_null($_POST['chk_make_sitemap'])) $options['chk_make_sitemap'] = $_POST['chk_make_sitemap'];
-
-            if(!is_null($_POST['opt_keyword_decorate_bold_type'])) $options['opt_keyword_decorate_bold_type'] = $_POST['opt_keyword_decorate_bold_type'];
-            if(!is_null($_POST['opt_keyword_decorate_italic_type'])) $options['opt_keyword_decorate_italic_type'] = $_POST['opt_keyword_decorate_italic_type'];
-            if(!is_null($_POST['opt_keyword_decorate_underline_type'])) $options['opt_keyword_decorate_underline_type'] = $_POST['opt_keyword_decorate_underline_type'];
-
-            if(!is_null($_POST['opt_image_alternate_type'])) $options['opt_image_alternate_type'] = $_POST['opt_image_alternate_type'];
-            if(!is_null($_POST['opt_image_title_type'])) $options['opt_image_title_type'] = $_POST['opt_image_title_type'];
-            if(!is_null($_POST['txt_image_alternate'])) $options['txt_image_alternate'] = $_POST['txt_image_alternate'];
-            if(!is_null($_POST['txt_image_title'])) $options['txt_image_title'] = $_POST['txt_image_title'];
-
-            if(!is_null($_POST['txt_generic_tags'])) $options['txt_generic_tags'] = $_POST['txt_generic_tags'];
-            if(!is_null($_POST['chk_tagging_using_google'])) $options['chk_tagging_using_google'] = $_POST['chk_tagging_using_google'];
-
-
-            if(!is_null($_POST['chk_block_login_page'])) $options['chk_block_login_page'] = $_POST['chk_block_login_page'];
-            if(!is_null($_POST['chk_block_admin_page'])) $options['chk_block_admin_page'] = $_POST['chk_block_admin_page'];
-
-            if(!is_null($_POST['lsi_bing_api_key'])) $options['lsi_bing_api_key'] = $_POST['lsi_bing_api_key'];
-
+            if(isset($_POST['lsi_bing_api_key']) && !is_null($_POST['lsi_bing_api_key'])) $options['lsi_bing_api_key'] = sanitize_text_field($_POST['lsi_bing_api_key']);
+            /******************************************** for dynamic homepage **************************************/
+              if(isset($_POST['chk_homepage_static']) && !is_null($_POST['chk_homepage_static'])) $options['chk_homepage_static'] = $_POST['chk_homepage_static'];
+              if(isset($_POST['wsw_homepage_title'])) $options['wsw_homepage_title'] = sanitize_title($_POST['wsw_homepage_title']);
+              if(isset($_POST['wsw_homepage_desc'])) $options['wsw_homepage_desc'] = sanitize_text_field($_POST['wsw_homepage_desc']);
+              if(isset($_POST['wsw_homepage_keywords'])) $options['wsw_homepage_keywords'] = sanitize_text_field($_POST['wsw_homepage_keywords']);
+            /*******************************************************************************************************/
+            /******************************************** for webmaster tools ***************************************/
+              if(isset($_POST['wsw_webmaster_content'])) $options['wsw_webmaster_content'] = sanitize_text_field($_POST['wsw_webmaster_content']);
+              if(isset($_POST['wsw_bing_webmaster'])) $options['wsw_bing_webmaster'] = sanitize_text_field($_POST['wsw_bing_webmaster']);
+              if(isset($_POST['wsw_pinterest_verify'])) $options['wsw_pinterest_verify'] = sanitize_text_field($_POST['wsw_pinterest_verify']);
+           /********************************************************************************************************/
             WSW_Settings::update_options($options);
 
             die();
@@ -499,62 +497,67 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         /** Ajax module for save post */
         static public function ajax_save_post_settings(){
             $settings = array();
-
-            $post_id = $_POST['post_id'];
-            $settings['keyword_value'] = $_POST['keyword_value'];
+            check_ajax_referer('wsw-metabox-ajax-nonce' , 'security' , false);
+            $post_id = sanitize_text_field( $_POST['post_id'] ) ;
+            $settings['keyword_value'] = sanitize_text_field($_POST['keyword_value']);
             $settings['is_meta_keyword'] = $_POST['is_meta_keyword'];
-            $settings['meta_keyword_type'] = $_POST['meta_keyword_type'];
+            $settings['meta_keyword_type'] = isset($_POST['meta_keyword_type']) ? sanitize_text_field($_POST['meta_keyword_type']) : '';
             $settings['is_meta_title'] = $_POST['is_meta_title'];
-            $settings['meta_title'] = $_POST['meta_title'];
+            $settings['meta_title'] = sanitize_text_field($_POST['meta_title']);
             $settings['is_meta_description'] = $_POST['is_meta_description'];
             $settings['is_meta_robot_noindex'] = $_POST['is_meta_robot_noindex'];
             $settings['is_meta_robot_nofollow'] = $_POST['is_meta_robot_nofollow'];
-            $settings['meta_description'] = $_POST['meta_description'];
+            $settings['is_meta_robot_noodp'] = $_POST['is_meta_robot_noodp'];
+            $settings['is_meta_robot_noydir'] =$_POST['is_meta_robot_noydir'];
+            $settings['meta_description'] = sanitize_text_field($_POST['meta_description']);
             $settings['is_over_sentences'] = $_POST['is_over_sentences'];
             $settings['first_over_sentences'] = $_POST['first_over_sentences'];
             $settings['last_over_sentences'] = $_POST['last_over_sentences'];
 
             $settings['is_rich_snippets'] = $_POST['is_rich_snippets'];
             $settings['show_rich_snippets'] = $_POST['show_rich_snippets'];
-            $settings['rating_value'] = $_POST['rating_value'];
-            $settings['review_author'] = $_POST['review_author'];
-            $settings['review_summary'] = $_POST['review_summary'];
-            $settings['review_description'] = $_POST['review_description'];
+            $settings['rating_value'] = sanitize_text_field($_POST['rating_value']);
+            $settings['review_author'] = sanitize_text_field($_POST['review_author']);
+            $settings['review_summary'] = sanitize_text_field($_POST['review_summary']);
+            $settings['review_description'] = sanitize_text_field($_POST['review_description']);
 
-            $settings['event_name'] = $_POST['event_name'];
-            $settings['event_date'] = $_POST['event_date'];
-            $settings['event_url'] = $_POST['event_url'];
-            $settings['event_location_name'] = $_POST['event_location_name'];
-            $settings['event_location_street'] = $_POST['event_location_street'];
-            $settings['event_location_locality'] = $_POST['event_location_locality'];
-            $settings['event_location_region'] = $_POST['event_location_region'];
+            $settings['event_name'] = sanitize_text_field($_POST['event_name']);
+            $settings['event_date'] = sanitize_text_field($_POST['event_date']);
+            $settings['event_url'] = sanitize_text_field($_POST['event_url']);
+            $settings['event_location_name'] = sanitize_text_field($_POST['event_location_name']);
+            $settings['event_location_street'] = sanitize_text_field($_POST['event_location_street']);
+            $settings['event_location_locality'] = sanitize_text_field($_POST['event_location_locality']);
+            $settings['event_location_region'] = sanitize_text_field($_POST['event_location_region']);
 
-            $settings['people_fname'] = $_POST['people_fname'];
-            $settings['people_lname'] = $_POST['people_lname'];
-            $settings['people_locality'] = $_POST['people_locality'];
-            $settings['people_region'] = $_POST['people_region'];
-            $settings['people_title'] = $_POST['people_title'];
-            $settings['people_homeurl'] = $_POST['people_homeurl'];
-            $settings['people_photourl'] = $_POST['people_photourl'];
+            $settings['people_fname'] = sanitize_text_field($_POST['people_fname']);
+            $settings['people_lname'] = sanitize_text_field($_POST['people_lname']);
+            $settings['people_locality'] = sanitize_text_field($_POST['people_locality']);
+            $settings['people_region'] = sanitize_text_field($_POST['people_region']);
+            $settings['people_title'] = sanitize_text_field($_POST['people_title']);
+            $settings['people_homeurl'] = sanitize_text_field($_POST['people_homeurl']);
+            $settings['people_photourl'] = sanitize_text_field($_POST['people_photourl']);
 
-            $settings['product_name'] = $_POST['product_name'];
-            $settings['product_imageurl'] = $_POST['product_imageurl'];
-            $settings['product_description'] = $_POST['product_description'];
-            $settings['product_offers'] = $_POST['product_offers'];
+            $settings['product_name'] = sanitize_text_field($_POST['product_name']);
+            $settings['product_imageurl'] = sanitize_text_field($_POST['product_imageurl']);
+            $settings['product_description'] = sanitize_text_field($_POST['product_description']);
+            $settings['product_offers'] = sanitize_text_field($_POST['product_offers']);
 
 
             $settings['is_social_facebook'] = $_POST['is_social_facebook'];
-            $settings['social_facebook_publisher'] = $_POST['social_facebook_publisher'];
-            $settings['social_facebook_author'] = $_POST['social_facebook_author'];
-            $settings['social_facebook_title'] = $_POST['social_facebook_title'];
-            $settings['social_facebook_description'] = $_POST['social_facebook_description'];
+            $settings['social_facebook_publisher'] = sanitize_text_field($_POST['social_facebook_publisher']);
+            $settings['social_facebook_author'] = sanitize_text_field($_POST['social_facebook_author']);
+            $settings['social_facebook_title'] = sanitize_text_field($_POST['social_facebook_title']);
+            $settings['social_facebook_description'] = sanitize_text_field($_POST['social_facebook_description']);
 
             $settings['is_social_twitter'] = $_POST['is_social_twitter'];
-            $settings['social_twitter_title'] = $_POST['social_twitter_title'];
-            $settings['social_twitter_description'] = $_POST['social_twitter_description'];
+            $settings['social_twitter_title'] = sanitize_text_field($_POST['social_twitter_title']);
+            $settings['social_twitter_description'] = sanitize_text_field($_POST['social_twitter_description']);
+            $settings['autolink_anchor']=sanitize_text_field($_POST['autolink_anchor']);
+            $settings['is_disable_autolink']=$_POST['is_disable_autolink'];
 
             update_post_meta($post_id, 'wsw-settings', $settings);
-
+            $post_title = get_the_title($post_id);
+            echo $post_title;
             die();
         }
 
@@ -564,74 +567,72 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
          * @return 	void
          * @access 	public
          */
-        function show_metabox_below() {
+        public static function show_metabox_below() {
             global $post;
 
             $variables = array();
             $variables['wsw_post_id'] = $post->ID;
-
             $settings = get_post_meta( $post->ID , 'wsw-settings');
-
-            if(isset($settings)){
-
+            if( isset($settings)){
                 /** General Settings */
-                $variables['wsw_keyword_value'] = $settings[0]['keyword_value'];
-                $variables['wsw_is_meta_keyword'] = $settings[0]['is_meta_keyword'];
-                $variables['wsw_meta_keyword_type'] = $settings[0]['meta_keyword_type'];
-                $variables['wsw_is_meta_title'] = $settings[0]['is_meta_title'];
-                $variables['wsw_meta_title'] = $settings[0]['meta_title'];
-                $variables['wsw_is_meta_description'] = $settings[0]['is_meta_description'];
-                $variables['wsw_is_meta_robot_noindex'] = $settings[0]['is_meta_robot_noindex'];
-                $variables['wsw_is_meta_robot_nofollow'] = $settings[0]['is_meta_robot_nofollow'];
-                $variables['wsw_meta_description'] = $settings[0]['meta_description'];
-                $variables['wsw_is_over_sentences'] = $settings[0]['is_over_sentences'];
-                $variables['wsw_first_over_sentences'] = $settings[0]['first_over_sentences'];
-                $variables['wsw_last_over_sentences'] = $settings[0]['last_over_sentences'];
+                $variables['wsw_keyword_value'] = isset($settings[0]['keyword_value']) ? $settings[0]['keyword_value'] : '' ;
+                $variables['wsw_is_meta_keyword'] = isset($settings[0]['is_meta_keyword']) ? $settings[0]['is_meta_keyword'] : '';
+                $variables['wsw_meta_keyword_type'] = isset( $settings[0]['meta_keyword_type']) ? $settings[0]['meta_keyword_type'] : '';
+                $variables['wsw_is_meta_title'] = isset( $settings[0]['is_meta_title'] ) ? $settings[0]['is_meta_title'] : '';
+                $variables['wsw_meta_title'] = isset( $settings[0]['meta_title'] ) ? $settings[0]['meta_title'] : '';
+                $variables['wsw_is_meta_description'] = isset( $settings[0]['is_meta_description'] ) ? $settings[0]['is_meta_description'] : '';
+                $variables['wsw_is_meta_robot_noindex'] = isset( $settings[0]['is_meta_robot_noindex'] ) ? $settings[0]['is_meta_robot_noindex'] : '';
+                $variables['wsw_is_meta_robot_nofollow'] = isset( $settings[0]['is_meta_robot_nofollow'] ) ? $settings[0]['is_meta_robot_nofollow'] : '';
+               $variables['wsw_is_meta_robot_noodp'] = isset( $settings[0]['is_meta_robot_noodp'] ) ? $settings[0]['is_meta_robot_noodp'] : '';
+                $variables['wsw_is_meta_robot_noydir'] = isset( $settings[0]['is_meta_robot_noydir'] ) ? $settings[0]['is_meta_robot_noydir'] : '';
+               $variables['wsw_meta_description'] = isset( $settings[0]['meta_description'] ) ? $settings[0]['meta_description'] : '';
+                $variables['wsw_is_over_sentences'] = isset( $settings[0]['is_over_sentences'] ) ? $settings[0]['is_over_sentences'] : '';
+                $variables['wsw_first_over_sentences'] = isset( $settings[0]['first_over_sentences'] ) ? $settings[0]['first_over_sentences'] : '';
+                $variables['wsw_last_over_sentences'] = isset( $settings[0]['last_over_sentences'] ) ? $settings[0]['last_over_sentences'] : '';
 
                 /** Rich Snippets Settings */
-                $variables['wsw_is_rich_snippets'] = $settings[0]['is_rich_snippets'];
-                $variables['wsw_show_rich_snippets'] = $settings[0]['show_rich_snippets'];
+                $variables['wsw_is_rich_snippets'] = isset( $settings[0]['is_rich_snippets'] ) ? $settings[0]['is_rich_snippets'] : '';
+                $variables['wsw_show_rich_snippets'] = isset( $settings[0]['show_rich_snippets'] ) ? $settings[0]['show_rich_snippets'] : '';
 
-                $variables['wsw_rating_value'] = $settings[0]['rating_value'];
-                $variables['wsw_review_author'] = $settings[0]['review_author'];
-                $variables['wsw_review_summary'] = $settings[0]['review_summary'];
-                $variables['wsw_review_description'] = $settings[0]['review_description'];
+                $variables['wsw_rating_value'] = isset( $settings[0]['rating_value'] ) ? $settings[0]['rating_value'] : '';
+                $variables['wsw_review_author'] = isset( $settings[0]['review_author'] ) ? $settings[0]['review_author'] : '';
+                $variables['wsw_review_summary'] = isset( $settings[0]['review_summary'] ) ? $settings[0]['review_summary'] : '';
+                $variables['wsw_review_description'] = isset( $settings[0]['review_description'] ) ? $settings[0]['review_description'] : '';
 
-                $variables['wsw_event_name'] = $settings[0]['event_name'];
-                $variables['wsw_event_date'] = $settings[0]['event_date'];
-                $variables['wsw_event_url'] = $settings[0]['event_url'];
-                $variables['wsw_event_location_name'] = $settings[0]['event_location_name'];
-                $variables['wsw_event_location_street'] = $settings[0]['event_location_street'];
-                $variables['wsw_event_location_locality'] = $settings[0]['event_location_locality'];
-                $variables['wsw_event_location_region'] = $settings[0]['event_location_region'];
+                $variables['wsw_event_name'] = isset( $settings[0]['event_name'] ) ? $settings[0]['event_name'] : '';
+                $variables['wsw_event_date'] = isset( $settings[0]['event_date'] ) ? $settings[0]['event_date'] : '';
+                $variables['wsw_event_url'] = isset( $settings[0]['event_url'] ) ? $settings[0]['event_url'] : '';
+                $variables['wsw_event_location_name'] = isset( $settings[0]['event_location_name'] ) ? $settings[0]['event_location_name'] : '';
+                $variables['wsw_event_location_street'] = isset( $settings[0]['event_location_street'] ) ? $settings[0]['event_location_street'] : '';
+                $variables['wsw_event_location_locality'] = isset( $settings[0]['event_location_locality'] ) ? $settings[0]['event_location_locality'] : '';
+                $variables['wsw_event_location_region'] = isset( $settings[0]['event_location_region'] ) ? $settings[0]['event_location_region'] : '';
 
-                $variables['wsw_people_fname'] = $settings[0]['people_fname'];
-                $variables['wsw_people_lname'] = $settings[0]['people_lname'];
-                $variables['wsw_people_locality'] = $settings[0]['people_locality'];
-                $variables['wsw_people_region'] = $settings[0]['people_region'];
-                $variables['wsw_people_title'] = $settings[0]['people_title'];
-                $variables['wsw_people_homeurl'] = $settings[0]['people_homeurl'];
-                $variables['wsw_people_photourl'] = $settings[0]['people_photourl'];
+                $variables['wsw_people_fname'] = isset( $settings[0]['people_fname'] ) ? $settings[0]['people_fname'] : '';
+                $variables['wsw_people_lname'] = isset( $settings[0]['people_lname']) ? $settings[0]['people_lname'] : '';
+                $variables['wsw_people_locality'] = isset( $settings[0]['people_locality'] ) ? $settings[0]['people_locality'] : '';
+                $variables['wsw_people_region'] = isset( $settings[0]['people_region']) ? $settings[0]['people_region'] : '';
+                $variables['wsw_people_title'] = isset( $settings[0]['people_title'] ) ? $settings[0]['people_title'] : '';
+                $variables['wsw_people_homeurl'] = isset( $settings[0]['people_homeurl'] ) ? $settings[0]['people_homeurl'] : '';
+                $variables['wsw_people_photourl'] = isset ( $settings[0]['people_photourl'] ) ? $settings[0]['people_photourl'] : '';
 
-                $variables['wsw_product_name'] = $settings[0]['product_name'];
-                $variables['wsw_product_imageurl'] = $settings[0]['product_imageurl'];
-                $variables['wsw_product_description'] = $settings[0]['product_description'];
-                $variables['wsw_product_offers'] = $settings[0]['product_offers'];
+                $variables['wsw_product_name'] = isset ( $settings[0]['product_name'] ) ? $settings[0]['product_name'] : '';
+                $variables['wsw_product_imageurl'] = isset ( $settings[0]['product_imageurl'] ) ? $settings[0]['product_imageurl'] : '';
+                $variables['wsw_product_description'] = isset( $settings[0]['product_description'] ) ? $settings[0]['product_description'] : '';
+                $variables['wsw_product_offers'] = isset( $settings[0]['product_offers']) ? $settings[0]['product_offers'] : '';
 
-                $variables['wsw_is_social_facebook'] = $settings[0]['is_social_facebook'];
-                $variables['wsw_social_facebook_publisher'] = $settings[0]['social_facebook_publisher'];
-                $variables['wsw_social_facebook_author'] = $settings[0]['social_facebook_author'];
-                $variables['wsw_social_facebook_title'] = $settings[0]['social_facebook_title'];
-                $variables['wsw_social_facebook_description'] = $settings[0]['social_facebook_description'];
+                $variables['wsw_is_social_facebook'] = isset( $settings[0]['is_social_facebook'] ) ? $settings[0]['is_social_facebook'] : '';
+                $variables['wsw_social_facebook_publisher'] = isset( $settings[0]['social_facebook_publisher'] ) ? $settings[0]['social_facebook_publisher'] : '';
+                $variables['wsw_social_facebook_author'] = isset( $settings[0]['social_facebook_author'] ) ? $settings[0]['social_facebook_author'] : '';
+                $variables['wsw_social_facebook_title'] = isset( $settings[0]['social_facebook_title'] ) ? $settings[0]['social_facebook_title'] : '';
+                $variables['wsw_social_facebook_description'] = isset( $settings[0]['social_facebook_description'] ) ? $settings[0]['social_facebook_description'] : '';
 
-                $variables['wsw_is_social_twitter'] = $settings[0]['is_social_twitter'];
-                $variables['wsw_social_twitter_title'] = $settings[0]['social_twitter_title'];
-                $variables['wsw_social_twitter_description'] = $settings[0]['social_twitter_description'];
-
+                $variables['wsw_is_social_twitter'] = isset( $settings[0]['is_social_twitter'] ) ? $settings[0]['is_social_twitter'] : '';
+                $variables['wsw_social_twitter_title'] = isset( $settings[0]['social_twitter_title'] ) ? $settings[0]['social_twitter_title'] : '';
+                $variables['wsw_social_twitter_description'] = isset( $settings[0]['social_twitter_description'] ) ? $settings[0]['social_twitter_description'] : '';
+                $variables['wsw_autolink_anchor'] = isset( $settings[0]['autolink_anchor'] ) ? $settings[0]['autolink_anchor'] : '';
+                $variables['is_disable_autolink']= isset( $settings[0]['is_disable_autolink'] ) ? $settings[0]['is_disable_autolink'] : '';
                 self::enqueue_styles();
-
             }
-
             echo self::render_template( 'global-settings/page-metabox-below.php', $variables );
         }
         function show_metabox() {
@@ -649,10 +650,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
             $post_id = $_POST['post_id'];
             $post    = get_post( $post_id );
             $post_content = $post->post_content;
-
-
             echo WSW_Calc::calc_post_score($post_content);
-
             die();
         }
         static public function ajax_calc_post_density(){
@@ -660,11 +658,10 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
             $post_id = $_POST['post_id'];
             $post    = get_post( $post_id );
             $post_content = $post->post_content;
-
             $settings = get_post_meta( $post_id , 'wsw-settings');
-
-            $keyword = $settings[0]['keyword_value'];
-            if($keyword!='' && $post_content!='' )     echo WSW_Calc::calc_post_density($post_content, $keyword);
+            $keyword = isset($settings[0]['keyword_value']) ? $settings[0]['keyword_value'] : '';
+            if($keyword!='' && $post_content!='' )
+                echo WSW_Calc::calc_post_density($post_content, $keyword);
             else echo '0.00';
             die();
         }
@@ -676,12 +673,12 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
 
             $settings = get_post_meta( $post->ID , 'wsw-settings');
 
-
+            $keyword = isset($settings[0]['keyword_value']) ? $settings[0]['keyword_value'] : '';
             $suggestions = array();
 
             $global_settings = WSW_Main::$settings;
 
-            $isHeading = WSW_Calc::get_keyword_decoration_bold($post_content, $settings[0]['keyword_value']);
+            $isHeading = WSW_Calc::get_keyword_decoration_bold($post_content, $keyword);
 
 
             if($isHeading == '1'){
@@ -696,7 +693,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
                     'state' => 'no'
                 );
             }
-            $isHeading = WSW_Calc::get_keyword_decoration_italic($post_content, $settings[0]['keyword_value']);
+            $isHeading = WSW_Calc::get_keyword_decoration_italic($post_content, $keyword);
             if($isHeading == '1'){
                 $suggestions[] =array (
                     'msg' => 'You have keyword in italic.',
@@ -710,7 +707,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
                 );
             }
 
-            $isHeading = WSW_Calc::get_keyword_decoration_underline($post_content, $settings[0]['keyword_value']);
+            $isHeading = WSW_Calc::get_keyword_decoration_underline($post_content, $keyword);
             if($isHeading == '1'){
                 $suggestions[] =array (
                     'msg' => 'You have keyword in underline.',
@@ -724,7 +721,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
                 );
             }
 
-            $isHeading = WSW_Calc::get_headings_h1($post_content, $settings[0]['keyword_value']);
+            $isHeading = WSW_Calc::get_headings_h1($post_content, $keyword);
 
             if($isHeading == '1'){
                 $suggestions[] =array (
@@ -739,7 +736,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
                 );
             }
 
-            $isHeading = WSW_Calc::get_headings_h2($post_content, $settings[0]['keyword_value']);
+            $isHeading = WSW_Calc::get_headings_h2($post_content, $keyword);
             if($isHeading == '1'){
                 $suggestions[] =array (
                     'msg' => 'You have keyword in H2 tag.',
@@ -753,7 +750,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
                 );
             }
 
-            $isHeading = WSW_Calc::get_headings_h3($post_content, $settings[0]['keyword_value']);
+            $isHeading = WSW_Calc::get_headings_h3($post_content, $keyword);
             if($isHeading == '1'){
                 $suggestions[] =array (
                     'msg' => 'You have keyword in H3 tag.',
@@ -880,7 +877,7 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
             $post    = get_post( $post_id );
 
             $settings = get_post_meta( $post_id , 'wsw-settings');
-            $keyword = $settings[0]['keyword_value'];
+            $keyword =isset($settings[0]['keyword_value']) ? $settings[0]['keyword_value'] : '';
 
             $tmp_arr = WSW_LSI::get_lsi_by_keyword($keyword);
             if(count($tmp_arr)){
@@ -896,15 +893,13 @@ if ( ! class_exists( 'WSW_Dashboard' ) ) {
         static public function ajax_set_support_link(){
             $options = WSW_Main::$settings;
             $options['chk_author_linking'] = '1';
-//error_log("option_1",$options['chk_author_linking']);
             WSW_Settings::update_options($options);
-
-
             die();
         }
         static public function ajax_set_support_time(){
             $options = WSW_Main::$settings;
             $options['wsw_initial_dt'] = time();
+            $options['wsw_set_time_check']=$_POST['set_time_check'];
             WSW_Settings::update_options($options);
 
             die();

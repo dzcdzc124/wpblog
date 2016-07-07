@@ -78,13 +78,14 @@
 
         jQuery( '#wsw-notice-support-close' ).click( function (event) {
 
-            jQuery("#wsw-notice-support-view").hide();
+
 
 
 
             var data = {
 
-                action:'wsw_set_support_time'
+                action:'wsw_set_support_time',
+                set_time_check:'1'
 
             };
 
@@ -92,7 +93,7 @@
 
             jQuery.post(ajax_object.ajax_url, data, function(respond) {
 
-
+                jQuery("#wsw-notice-support-view").hide();
 
             });
 
@@ -113,6 +114,7 @@
                 var data = {
 
                     action:'wsw_set_support_link'
+
 
                 };
 
@@ -157,17 +159,22 @@
 <div class="updated" id="wsw-notice-support-view" style="<?php
 
     if(WSW_Main::$settings['chk_author_linking'] == '0'){
+        if((time() - WSW_Main::$settings['wsw_initial_dt']) <= 24*60*60 ){
+            if( WSW_Main::$settings['wsw_set_time_check']=='0'){
+                echo 'display:block;';
+            }
+            else if( WSW_Main::$settings['wsw_set_time_check']=='1'){
 
-        if((time() - WSW_Main::$settings['wsw_initial_dt']) <= 24 * 60 * 60){
-
-        //if((time() - WSW_Main::$settings['wsw_initial_dt']) >= 1){
-
+            echo 'display:none;';
+            }
         }
 
         else{
 
-            echo 'display: none;';
-
+            echo 'display: block;';
+            $option = get_option('SEOWizard_Options');
+            $option['wsw_set_time_check'] = '0';
+            update_option('SEOWizard_Options',$option);
         }
 
     }
@@ -183,24 +190,23 @@
 ?>">
 
 
-
     <div class="wsw-support-click-title wsw-support-click-common" id="wsw_support_title_1">Thank you for using
 
         <a href="<?php  $url = admin_url();
 
-        echo $url . 'admin.php?page=wsw_dashboard_page';?>">SEO Wizard Plugin</a>,  if you enjoy our plugin please activate the author link credit by clicking
+        echo $url . 'admin.php?page=wsw_dashboard_page';?>">SEO Wizard</a>,  
 
-        <a href="#" id="wsw-notice-support-click"> OK.</a>
+        <a href="#" id="wsw-notice-support-click"> if you like our plugin please activate the author credits by clicking here!</a>
 
 
 
     </div>
 
-    <div class="wsw-support-click-title wsw-support-click-common" id="wsw_support_title_2" style="display: none;">Thank you for supporting our plugin, the link has been placed in your footer.</div>
+    <div class="wsw-support-click-title wsw-support-click-common" id="wsw_support_title_2" style="display: none;">Thank you for supporting Seo Wizard.</div>
 
     <div style="float: right;" id="wsw_support_title_3">
 
-        <small><a href="#" id="wsw-notice-support-close"> Hide this Message</a> </small>
+        <small><a href="#" id="wsw-notice-support-close"> X</a> </small>
 
     </div>
 

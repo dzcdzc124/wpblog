@@ -1,19 +1,12 @@
 
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
-	RewriteEngine On
-
-	RewriteCond %{HTTP_HOST} ^toucanz.com [NC]
-	RewriteCond %{HTTP_HOST} ^blog.toucanz.com [NC]
-	RewriteCond %{HTTP_HOST} ^120.25.254.43 [NC]
-	RewriteRule ^(.*)$ http://www.toucanz.com$1 [L,R=301]
-
-	RewriteBase /
-	RewriteRule ^index\.php$ - [L]
-
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule . /index.php [L]
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
 </IfModule>
 
 # END WordPress

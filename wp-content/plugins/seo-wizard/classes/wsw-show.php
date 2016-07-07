@@ -19,53 +19,53 @@ if ( ! class_exists( 'WSW_Show' ) ) {
          */
         public function register_hook_callbacks() {
 
-            add_action('wp_head', __CLASS__. '::fake_wp_head' );
-            add_action('wp_footer', __CLASS__. '::fake_wp_footer' );
-            add_action('login_head', __CLASS__. '::fake_login_head' );
-            add_action('admin_head', __CLASS__. '::fake_admin_head' );
+            add_action('wp_head', array($this, 'fake_wp_head') );
+            add_action('wp_footer', array($this,'fake_wp_footer') );
+            add_action('login_head', array($this,'fake_login_head') );
+            add_action('admin_head', array($this,'fake_admin_head') );
 
             // Add filter for POST content
-            add_filter('the_content', __CLASS__. '::filter_post_content', 1, 2);
+            add_filter('the_content', array($this,'filter_post_content'), 1, 2);
             // Add filter for POST title
-            add_filter('the_title', __CLASS__. '::filter_post_title', 1, 2);
+            add_filter('the_title', array($this,'filter_post_title'), 1, 2);
             // Filter the Posts Slugs
-            add_filter('name_save_pre', __CLASS__. '::filter_post_slug',10);
+            add_filter('name_save_pre', array($this, 'filter_post_slug'),10);
 
 
             if(WSW_Main::$settings['chk_tweak_permalink'] == '1'){
                 // Strip the category base
-                add_action('created_category', __CLASS__. '::no_category_base_refresh_rules');
-                add_action('edited_category', __CLASS__. '::no_category_base_refresh_rules');
-                add_action('delete_category', __CLASS__. '::no_category_base_refresh_rules');
-                add_action('init', __CLASS__. '::no_category_base_permastruct');
+                add_action('created_category', array($this,'no_category_base_refresh_rules'));
+                add_action('edited_category', array($this,'no_category_base_refresh_rules'));
+                add_action('delete_category', array($this,'no_category_base_refresh_rules'));
+                add_action('init', array($this,'no_category_base_permastruct'));
 
                 // Add our custom category rewrite rules
-                add_filter('category_rewrite_rules', __CLASS__. '::no_category_base_rewrite_rules');
+                add_filter('category_rewrite_rules', array($this,'no_category_base_rewrite_rules'));
                 // Add 'category_redirect' query variable
-                add_filter('query_vars',  __CLASS__. '::no_category_base_query_vars');
+                add_filter('query_vars',  array($this,'no_category_base_query_vars'));
                 // Redirect if 'category_redirect' is set
-                add_filter('request', __CLASS__. '::no_category_base_request');
+                add_filter('request', array($this,'no_category_base_request'));
 
             }
 
 
         }
 
-        function fake_login_head() {
+      public  function fake_login_head() {
             if (WSW_Main::$settings['chk_block_login_page'] == '1') {
                 echo "\n<!-- WordPress SEO Wizard -->\n";
                 echo "<link rel=\"canonical\" href=\"".get_option('home')."\" />\n";
                 echo "<!-- WordPress SEO Wizard -->\n";
             }
         }
-        function fake_admin_head() {
+      public  function fake_admin_head() {
             if (WSW_Main::$settings['chk_block_admin_page'] == '1') {
                 echo "\n<!-- WordPress SEO Wizard -->\n";
                 echo "<link rel=\"canonical\" href=\"".get_option('home')."\" />\n";
                 echo "<!-- WordPress SEO Wizard -->\n";
             }
         }
-        function filter_post_slug($slug) {
+        public  function filter_post_slug($slug) {
             // If settings is enable, filter the Slug
             $settings = WSW_Main::$settings;
 
@@ -79,18 +79,16 @@ if ( ! class_exists( 'WSW_Show' ) ) {
         /**
          * hook wp_head
          */
-        public function fake_wp_head() {
+        public  function fake_wp_head() {
             // Only to add the head in Single page where Post is shown
-            if (is_single() || is_page()) {
+            echo "<!------------ Created by Seo Wizard Wordpress Plugin - www.seowizard.org ----------->" ."\r\n";
+            if (is_single() || is_page() ) {
                 $post_id = get_the_ID();
-
                 $settings = get_post_meta( $post_id , 'wsw-settings');
-
-                if($settings[0]['is_meta_keyword']){
+                if(array_key_exists(0,$settings) && $settings[0]['is_meta_keyword']){
 
                     $meta_keyword_type = $settings[0]['meta_keyword_type'];
                     if (trim($meta_keyword_type)!='') {
-
                         if($meta_keyword_type == 'keywords'){
                             $meta_value = $settings[0]['keyword_value'];
                         }
@@ -108,18 +106,18 @@ if ( ! class_exists( 'WSW_Show' ) ) {
                                 $meta_value = implode(',', $tags_arr);
                             }
                         }
-                        if($meta_value!='')   echo '<meta name="keywords" content="' . $meta_value . '" />'. "\r\n";;
+                        if( isset( $meta_value ) && $meta_value!='')   echo '<meta name="keywords" content="' . $meta_value . '" />'. "\r\n";;
                     }
                 }
 
-                if($settings[0]['is_meta_title']){
+                if( array_key_exists(0,$settings) && $settings[0]['is_meta_title']){
                     $meta_title_metadata = $settings[0]['meta_title'];
                     if (trim($meta_title_metadata)!='') {
-                        echo '<meta name="title" content="' . $meta_title_metadata . '" />'. "\r\n";;
+                        echo '<meta name="title" content="' . $meta_title_metadata . '" />'. "\r\n";
                     }
                 }
 
-                if($settings[0]['is_meta_description']){
+                if( array_key_exists(0,$settings) && $settings[0]['is_meta_description']){
                     $meta_description_metadata = $settings[0]['meta_description'];
                     if (trim($meta_description_metadata)!='') {
                         echo '<meta name="description" content="' . $meta_description_metadata . '" />'. "\r\n";;
@@ -129,7 +127,7 @@ if ( ! class_exists( 'WSW_Show' ) ) {
                 /*
                  * Add Facebook meta data
                  */
-                if (WSW_Main::$settings['chk_use_facebook'] == '1' && $settings[0]['is_social_facebook']=='1') {
+                if (WSW_Main::$settings['chk_use_facebook'] == '1' && array_key_exists(0,$settings) && $settings[0]['is_social_facebook']=='1') {
                     echo '<meta property="og:type"   content="article" />' . "\r\n";
                     echo '<meta property="og:title"  content="' . esc_attr( $settings[0]['social_facebook_publisher'] ) . '" />' . "\r\n";
                     echo '<meta property="article:author"  content="' . esc_attr( $settings[0]['social_facebook_author'] ) . '" />' . "\r\n";
@@ -139,7 +137,7 @@ if ( ! class_exists( 'WSW_Show' ) ) {
                 /*
                  * Add Twitter meta data
                  */
-                if (WSW_Main::$settings['chk_use_twitter'] == '1' && $settings[0]['is_social_twitter']=='1') {
+                if (WSW_Main::$settings['chk_use_twitter'] == '1' && array_key_exists(0,$settings)&& $settings[0]['is_social_twitter']=='1') {
                     echo '<meta name="twitter:card" content="summary">' . "\n";
                     echo '<meta name="twitter:title" content="' . esc_attr( $settings[0]['social_twitter_title'] ) . '">' . "\n";
                     echo '<meta name="twitter:description" content="' . esc_attr( $settings[0]['social_twitter_description'] ) . '">' . "\n";
@@ -150,27 +148,76 @@ if ( ! class_exists( 'WSW_Show' ) ) {
                 */
                 if (WSW_Main::$settings['chk_use_meta_robot'] == '1') {
                     $strIndex = 'index';
-                    if($settings[0]['is_meta_robot_noindex'] == '1') $strIndex = 'noindex';
+                    if(array_key_exists(0,$settings) && $settings[0]['is_meta_robot_noindex'] == '1') $strIndex = 'noindex';
                     $strFollow = 'follow';
-                    if($settings[0]['is_meta_robot_nofollow'] == '1') $strIndex = 'nofollow';
+                    if( array_key_exists(0,$settings) && $settings[0]['is_meta_robot_nofollow'] == '1') $strFollow = 'nofollow';
                     echo '<meta name="robots" content="' . $strIndex . ',' . $strFollow .'" />' . "\n";
+
+                   $strODP = '';
+                    if(array_key_exists(0,$settings) && $settings[0]['is_meta_robot_noodp'] == '1')
+                    {
+                        $strODP = 'noodp';
+                        echo '<meta name="robots" content="' . $strODP .'" />' . "\n";
+                    }
+                    $strYDIR = '';
+                    if(array_key_exists(0,$settings) && $settings[0]['is_meta_robot_noydir'] == '1')
+                    {
+                        $strYDIR = 'noydir';
+                        echo '<meta name="robots" content="' .$strYDIR.'" />' . "\n";
+                    }
+
+
                 }
             }
+            if( is_front_page())
+            {
+                if(WSW_Main::$settings['wsw_webmaster_content'] !='')
+                {
+                    echo'<meta name = "google-site-verification" content ="'.trim(strip_tags(WSW_Main::$settings['wsw_webmaster_content'])).'"/>'."\r\n";
+                }
+                if(WSW_Main::$settings['wsw_bing_webmaster'] !='')
+                {
+                    echo'<meta name = "msvalidate.01" content ="'.trim(strip_tags(WSW_Main::$settings['wsw_bing_webmaster'])).'"/>'."\r\n";
+                }
+                if(WSW_Main::$settings['wsw_pinterest_verify'] !='')
+                {
+                    echo'<meta name = "p:domain_verify" content ="'.trim(strip_tags(WSW_Main::$settings['wsw_pinterest_verify'])).'"/>'."\r\n";
+                }
+            }
+            if( get_option('show_on_front') == 'posts' && is_home())
+            {
+                if(WSW_main::$settings['chk_homepage_static'] == '0')
+                {
+                    echo'<meta name = "title" content ="'.WSW_Main::$settings['wsw_homepage_title'].'"/>'."\r\n";
+                    echo'<meta name = "description" content = "'.WSW_Main::$settings['wsw_homepage_desc'].'"/>'."\r\n";
+                    $meta_values = explode(',', WSW_Main::$settings['wsw_homepage_keywords']);
+                    foreach($meta_values as $meta_value)
+                    {
+                       echo '<meta name="keywords" content="' . $meta_value . '" />'. "\r\n";
+                    }
+
+                }
+            }
+    echo "<!------------------------------------------------------------------------------>";
         }
+
 
         /**
          * hook wp_footer
          */
         public function fake_wp_footer() {
             // Only to add the head in Single page where Post is shown
-            if (is_single() || is_page()) {
-                $post_id = get_the_ID();
+        
+     //       if (is_single() || is_page()) {
+      //          $post_id = get_the_ID();
 
                 //$settings = get_post_meta( $post_id , 'wsw-settings');
 
                 if (WSW_Main::$settings['chk_author_linking'] == '1') {
-                     echo '<br><p align="center"><small>This site is using the Seo Wizard plugin by <a href="http://seo.uk.net/" target="_blank">http://seo.uk.net/</a></small></p>' . "\n";
-                }
+
+                    echo '<div align="center"><small>Seo wordpress plugin by <a href="http://www.seowizard.org/" title="Seo Wizard - All-in-one SEO plugin for Wordpress Sites" target="_blank">www.seowizard.org</a>.</small></div>' . "\n";
+
+   //             }
             }
         }
 
@@ -198,7 +245,7 @@ if ( ! class_exists( 'WSW_Show' ) ) {
 
             $settings = get_post_meta( $post_id , 'wsw-settings');
 
-            if(WSW_Main::$settings['chk_use_richsnippets'] == '1' && $settings[0]['is_rich_snippets'] == '1'){
+            if(WSW_Main::$settings['chk_use_richsnippets'] == '1' && array_key_exists(0,$settings) && $settings[0]['is_rich_snippets'] == '1'){
                 if($settings[0]['rating_value']!=0){
                     $variables = array();
                     $variables['seo_post_title'] = $post->post_title;
@@ -254,7 +301,7 @@ if ( ! class_exists( 'WSW_Show' ) ) {
             }
 
             // Apply settings related to keyword, if keyword is specified
-            if ($settings[0]['keyword_value'] != '') {
+            if ( array_key_exists(0,$settings) && $settings[0]['keyword_value'] != '') {
                 $filtered_content = self::apply_biu_to_content($filtered_content, $settings[0]['keyword_value']);
             }
 
@@ -304,13 +351,10 @@ if ( ! class_exists( 'WSW_Show' ) ) {
 
                 // Pass through all keyword until ends or until are applied all designs
                 $how_many_keys = WSW_Keywords::how_many_keywords(array($keyword), $new_content);
-
-
-
                 // To avoid make the request for each keyword: Get pieces by keyword for determine if some has the design applied
                 $pieces_by_keyword = WSW_Keywords::get_pieces_by_keyword(array($keyword), $new_content,TRUE);
-                $pieces_by_keyword_matches = $pieces_by_keyword[1];
-                $pieces_by_keyword = $pieces_by_keyword[0];
+                $pieces_by_keyword_matches = isset( $pieces_by_keyword[1] ) ? $pieces_by_keyword[1] : '';
+                $pieces_by_keyword = isset( $pieces_by_keyword[0] ) ? $pieces_by_keyword[0] : '';
 
                 // First, only check for designs already applied
                 for ($i=1;$i<=$how_many_keys;$i++) {
@@ -386,16 +430,17 @@ if ( ! class_exists( 'WSW_Show' ) ) {
                         }
                     }
                 }
-
-
             return $new_content;
         }
 
-        function filter_post_title($title,$post_id='') {
+        public function filter_post_title($title,$post_id='') {
 
             if ($post_id=='') {
                 global $post;
-                $post_id = $post->ID;
+                if(isset($post))
+                {
+                    $post_id = $post->ID;
+                }
             }
 
             if (!isset($post)) {
@@ -409,19 +454,21 @@ if ( ! class_exists( 'WSW_Show' ) ) {
             if ($title=='')
                 return 'no title';
 
-            if ($post->post_status=='auto-draft' || $post->post_status=='trash'
-                || $post->post_status=='inherit'
-            ) {
-                return $title;
+            if(isset($post))
+            {
+                if ($post->post_status=='auto-draft' || $post->post_status=='trash' || $post->post_status=='inherit') {
+                    return $title;
+                }
             }
 
-            $settings = get_post_meta( $post_id , 'wsw-settings');
+            if($post_id != ''){
+                $settings = get_post_meta( $post_id , 'wsw-settings');
+                if(array_key_exists(0,$settings) && trim($settings[0]['keyword_value']) == '') return $title;
+                if(array_key_exists(0,$settings)){
+                    $filtered_title = $title . ' | ' . $settings[0]['keyword_value'];
+                }
 
-
-            if(trim($settings[0]['keyword_value']) == '') return $title;
-
-            $filtered_title = $title . ' | ' . $settings[0]['keyword_value'];
-
+            }
 
             // Changed for Headway Theme
             if (! isset ( $filtered_title ) || trim ( $filtered_title ) == '') {

@@ -66,16 +66,16 @@ if ( ! class_exists( 'WSW_Main' ) ) {
 				'WSW_Dashboard'     => WSW_Dashboard::get_instance(),
                 'WSW_Show'          => WSW_Show::get_instance(),
 			);
+
 		}
 
 		public function register_hook_callbacks() {
 
-			add_action( 'wp_enqueue_scripts',    __CLASS__ . '::load_resources' );
-			add_action( 'admin_enqueue_scripts', __CLASS__ . '::load_resources' );
+			add_action( 'admin_enqueue_scripts', array($this, 'load_resources' ));
             add_action('admin_init',             array($this, 'admin_init'));
 
             // If the plugin isn't activated by Aweber or can be upgrade, show message
-            add_action('admin_notices',  __CLASS__ . '::show_admin_notice');
+            add_action('admin_notices',  array($this,'show_admin_notice'));
 		}
 
         public function show_admin_notice() {
@@ -119,8 +119,7 @@ if ( ! class_exists( 'WSW_Main' ) ) {
         /**
          * Register CSS, JavaScript, etc
          */
-        public static function load_resources() {
-
+        public function load_resources() {
             wp_register_script(
                 self::PREFIX . 'admin-js',
                 plugins_url( '/js/admin.js', dirname( __FILE__ ) ),
@@ -215,7 +214,12 @@ if ( ! class_exists( 'WSW_Main' ) ) {
             wp_localize_script(self::PREFIX . 'admin-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' )) );
             wp_enqueue_script( self::PREFIX . 'admin-js' );
             wp_enqueue_script( self::PREFIX . 'zeroclipboard-js' );
-
+            wp_enqueue_script( self::PREFIX . 'zozo-js' );
+            wp_enqueue_style(self::PREFIX . 'colorpicker-css');
+            wp_enqueue_style(self::PREFIX . 'zozo-tab-flat-css');
+            wp_enqueue_style(self::PREFIX . 'zozo-tab-css');
+            wp_enqueue_script( self::PREFIX . 'bootstrap-js' );
+            wp_enqueue_style(self::PREFIX . 'bootstrap-css');
 
         }
 
@@ -256,6 +260,15 @@ if ( ! class_exists( 'WSW_Main' ) ) {
 
         public function deactivate() {
            // WSW_Settings::delete_options();
+           /* $psdata = (array)get_option('seo_update', array());
+            if (!empty($psdata['modules'])) {
+                $module_keys = array_keys($psdata['modules']);
+                foreach ($module_keys as $module)
+                    delete_option("seo_update_module_$module");
+            }
+
+            //Delete plugin data
+            delete_option('seo_update');*/
             remove_filter('category_rewrite_rules', 'WSW_Show::no_category_base_rewrite_rules');
             global $wp_rewrite;
             update_option("SEOWizard_Options",'');

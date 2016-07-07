@@ -242,7 +242,7 @@ function category_excerpt($name,$options,$valueonly = false,$selected = false)
  */
 function post_type_excerpt($name,$options,$valueonly = false,$selected = false)
 {
-	$args = array('public' => false); 
+	$args = array('public' => true); 
 	$post_types = get_post_types($args,'objects');
 
 	// unset unexpected post type

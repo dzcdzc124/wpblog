@@ -56,17 +56,17 @@
     }
 </script>
 <div id="dashboard-page" class="box-border-box col-md-9" style="float: left; display:none; margin-right: 0px;margin-top: 0px;">
+<strong><font color="red"><font size="3">To see the full potential of Seo Wizard edit a page or a post.</font></font></strong><br />
+<strong><font color="green"><font size="3"><a href="http://www.seowizard.org/c-seo-wizard" target="_blank">Do you need better search engine rankings? The Seo Wizards can help you, visit our website!</a></font></font></strong><hr />
 
     <form action="admin.php?page=wsw_dashboard_page" id="wsw_log_404_form" method="post" class="form-horizontal" role="form">
-
-        <!-- Zozo Tabs Start-->
+       <!-- Zozo Tabs Start-->
         <div id="tabbed-nav">
             <!-- Tab Navigation Menu -->
             <ul>
                 <li><a>Global<span></span></a></li>
                 <li><a>Advanced<span></span></a></li>
                 <li><a>API Key<span></span></a></li>
-                <li><a>404 Monitor<span></span></a></li>
                 <li><a>XML Sitemap<span></span></a></li>
 
             </ul>
@@ -81,7 +81,9 @@
                         <div class="col-sm-11">
                             <label style="width: 100%;">
                                 <input type="checkbox" id="chk_keyword_to_titles" <?php echo ($chk_keyword_to_titles =='1')?'checked':''?>>
+                                <input type="hidden" name="wsw-global-ajax-nonce" id="wsw-global-ajax-nonce" value="<?php echo( wp_create_nonce( 'wsw-global-ajax-nonce' ) );?>" />
                                 Allow SEO Wizard to automatically add the keyword in Posts titles.
+
                             </label>
                          </div>
                     </div>
@@ -166,17 +168,65 @@
 
                 </div>
                 <!-- Advanced -->
+
                 <div>
+
                     <!-- Zozo Tabs nested (Subscribe) Start-->
                     <div class="nested-tabs">
                         <ul>
+                            <!------------- for dynamic homepage -------------------->
+                            <li ><a>Home Page Settings</a></li>
+                            <!-------------------------------------------------------->
                             <li><a>Keyword Decorate</a></li>
                             <li><a>Image Settings</a></li>
                             <li><a>Tags</a></li>
                             <li><a>Page Block</a></li>
-                            <li style="display: none;"><a>Other</a></li>
+                            <!-------------  for webmaster tools ------------------------>
+                            <li><a>Webmaster Verification</a></li>
+                            <!----------------------------------------------------------->
+
                          </ul>
                         <div>
+                            <!--  for dynamic front page-->
+                            <div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" id="chk-static-front">Use Static Front Page</label>
+                                    <input type="checkbox"  id="chk_homepage_static" <?php echo ($chk_homepage_static =='1')?'checked':''?>>
+                                </div>
+                                <div class="form-group" id="home-dynamic-settings"  style="display: none;">
+                                    <div class="col-sm-9 home-settings">
+                                        <label class="col-sm-3 control-label"> Home page title</label>
+                                        <textarea id="wsw_homepage_title" class="home-setting-text" maxlength="60"><?php echo $wsw_homepage_title; ?> </textarea>
+
+                                        <div class="left-numbers">
+                                            <input type="text" readonly id="title_left_numbers" class="count-numbers">
+                                            characters left. You should use a maximum 60 chars for the homepage title.
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-9 home-settings">
+                                        <label class="col-sm-3 control-label"> Home page description</label>
+                                        <textarea id="wsw_homepage_desc" class="home-setting-text" maxlength="160"><?php echo $wsw_homepage_desc; ?> </textarea>
+
+                                        <div class="left-numbers">
+                                            <input type="text" readonly id="desc_left_numbers" class="count-numbers" >
+                                            characters left. You should use a maximum 160 chars for the homepage
+                                            description.
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-9 home-settings">
+                                        <label class="col-sm-3 control-label"> Home page keywords</label>
+                                        <textarea id="wsw_homepage_keywords"
+                                                  class="home-setting-text"><?php echo $wsw_homepage_keywords; ?> </textarea>
+
+                                        <div class="left-numbers">
+                                            You should separate the keywords with comma(,).
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <!------------------------------------------------------------->
                             <div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Decorate your keyword with bold</label>
@@ -293,25 +343,34 @@
                                     </div>
                                 </div>
                             </div>
+                            <!---------------- for Webmaster verification ----------------------->
                             <div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label">Headings in theme</label>
+                                    <label class="col-sm-3 control-label">Google Webmaster Tools</label>
                                     <div class="col-sm-9">
-                                        <label style="width: 100%;">
-                                            <input type="checkbox" id="chk_use_headings_h1" <?php echo ($chk_use_headings_h1 =='1')?'checked':''?>>
-                                            The active Theme already uses H1 tags for post and page headings.
+                                        <label style="width: 100%">
+                                            <input type="text" id="wsw_webmaster_content" value="<?php echo $wsw_webmaster_content;?>"/>
                                         </label>
-                                        <label style="width: 100%;">
-                                            <input type="checkbox" id="chk_use_headings_h2" <?php echo ($chk_use_headings_h2 =='1')?'checked':''?>>
-                                            The active Theme already uses H2 tags for post and page headings.
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Bing Webmaster Center</label>
+                                    <div class="col-sm-9">
+                                        <label style="width: 100%">
+                                            <input type="text" id="wsw_bing_webmaster" value="<?php echo $wsw_bing_webmaster;?>"/>
                                         </label>
-                                        <label style="width: 100%;">
-                                            <input type="checkbox" id="chk_use_headings_h3" <?php echo ($chk_use_headings_h3 =='1')?'checked':''?>>
-                                            The active Theme already uses H3 tags for post and page headings.
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Pinterest Site Verification</label>
+                                    <div class="col-sm-9">
+                                        <label style="width: 100%">
+                                            <input type="text" id="wsw_pinterest_verify" value="<?php echo $wsw_pinterest_verify;?>"/>
                                         </label>
                                     </div>
                                 </div>
                             </div>
+
 
                         </div>
                     </div>
@@ -329,23 +388,7 @@
                     </div>
                 </div>
 
-                <!-- 404 Log -->
-                <div>
 
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <?php
-                            $table_list = new WSW_Table_Log();
-                            $table_list->prepare_items();
-                            ?>
-                                <input type="hidden" name="page" value="wsw_log_404">
-                                <?php
-                                $table_list->display();
-                                ?>
-                        </div>
-                    </div>
-
-                </div>
 
                 <!-- XML Sitemap -->
                 <div>
@@ -369,9 +412,12 @@
             </div>
 
         </div>
+
         <!-- Zozo Tabs End-->
-		<p>Access your <a href="../wp-admin/edit.php" target="_blank">Post(s)</a> or <a href="../wp-admin/edit.php?post_type=page" target="_blank">Page(s)</a> to view the full functionality of Seo Wizard.</p>
-		<br /><p><a href="http://seo.uk.net/?wizard" target="_blank"><img src="http://seo.uk.net/wp-content/uploads/2014/10/seo-banner.gif" /></a></p>
+		<br />
+
+
+<p><a href="http://www.seowizard.org/c-seo-wizard" target="_blank"><img src="<?php echo (WSW_Main::$plugin_url.'/../images/seo-banner.gif');?>" /></a></p>
         <div class="wsw-global-save-view">
         <button type="button"  class="btn btn-primary" onclick="save_global_settings();">Save Settings</button>
         </div>
@@ -385,10 +431,10 @@
             <p>SEO Wizard is an Wordpress Plugin software that allows you to optimizes your Wordpress better for top SEO ranking.</p>
             <ul class="sib-widget-menu">
                 <li>
-                    <a href="http://seo.uk.net/seo-wizard/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Plugin Features</a>
+                    <a href="http://www.seowizard.org/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Plugin Features</a>
                 </li>
                 <li>
-                    <a href="http://seo.uk.net/about-us/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Who we are</a>
+                    <a href="http://www.seowizard.org/c-seo-wizard" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;<font color="red">Boost Search Engine Rankings >></font></a>
                 </li>
             </ul>
         </div>
@@ -399,8 +445,8 @@
         <div class="panel-body">
             <p>You have a question or need more information ?</p>
             <ul class="sib-widget-menu">
-                <li><a href="http://seo.uk.net/seo-wizard/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Tutorials</a></li>
-                <li><a href="http://seo.uk.net/contact-us/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Contact us</a></li>
+                <li><a href="http://www.seowizard.org/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Tutorials</a></li>
+                <li><a href="http://www.seowizard.org/support/" target="_blank"><i class="fa fa-angle-right"></i> &nbsp;Plugin Support</a></li>
             </ul>
         </div>
     </div>

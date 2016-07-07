@@ -1,27 +1,20 @@
 === Easy Custom Auto Excerpt ===
 Contributors: Todi.Adiatmo, haristonjoo, Alzea
 Tags: excerpt, home, search, archive, automatic, auto, justify
-Requires at least: 3.0.3
-Tested up to: 4.3
+Requires at least: 3.5
+Tested up to: 4.5
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Auto Excerpt for your post on home, search and archive. Customize Read More button and thumbnail image. Easy to configure and have a lot of options.
-
 == Description ==
 
-Easy Custom Auto Excerpt is wordpress plugin to cut/excerpt your post displayed on the home , search or archive pages. This plugin also enable you to customize the readmore button text and thumbnail image. Just active the plugin, configure some options and you're good to go :) 
+Easy Custom Auto Excerpt is wordpress plugin to cut/excerpt your post displayed on the home , search or archive pages. This plugin also enable you to customize the readmore button text and thumbnail image. Just active the plugin, configure some options and you're good to go :)
 
 The free version is come with everything you need to auto excerpt your content.
 
-> [Demo](http://coba.tonjoostudio.com/ "Live demos of Easy Custom Auto Excerpt") | [Premium version](https://tonjoostudio.com/addons/easy-custom-auto-excerpt-premium/?utm_source=wp_org&utm_medium=link&utm_campaign=ecae "Get the premium version") | [Documentation](https://tonjoostudio.com/addons/easy-custom-auto-excerpt-premium/?utm_source=wp_org&utm_medium=link&utm_campaign=ecae#manual "Easy Custom Auto Excerpt Documentation") | [Video tutorials](https://www.youtube.com/watch?v=ZZaXfrB4-68 "ECAE Video tutorials") | [Support forum](https://forum.tonjoostudio.com/thread-category/easy-custom-auto-excerpt/ "ECAE Support forum") 
-
-
-**Screencast**
-
-https://www.youtube.com/watch?v=ZZaXfrB4-68
-
+> [Live Demo](http://coba.tonjoostudio.com/ "Live demos of ECAE") | <a href="http://wpexcerptplugin.com/" title="Get the premium version" rel="friend">Premium Version</a> | <a href="https://tonjoostudio.com/product/easy-custom-auto-excerpt-premium/?utm_source=wp_org&utm_medium=link&utm_campaign=ecae#manual" title="ECAE Documentation" rel="friend">Documentation</a> | [Support Forum](https://forum.tonjoostudio.com/thread-category/easy-custom-auto-excerpt/ "ECAE Support forum")
 
 **Features :**
 
@@ -42,7 +35,7 @@ And if you like our plugin and want to do more customization we offer the premiu
 * 10 Read More font type and custom font size
 * 40 + Read More button themes.
 
-Get the premium version on <a href="https://tonjoostudio.com/addons/easy-custom-auto-excerpt-premium/?utm_source=wp_org&utm_medium=link&utm_campaign=ecae" title="Easy Custom Auto Excerpt Premium" rel="friend">Easy Custom Auto Excerpt Premium</a>
+Get the premium version: <a href="http://wpexcerptplugin.com/" title="Easy Custom Auto Excerpt Premium" rel="friend">Easy Custom Auto Excerpt Premium</a>
 
 
 **Plugin Demo**
@@ -51,9 +44,9 @@ You can try the plugin on this url: http://coba.tonjoostudio.com
 * username: coba
 * password: 123456
 
-*if you have any questions,comment,customization request or suggestion please contact us via our <a href="https://forum.tonjoostudio.com/thread-category/easy-custom-auto-excerpt/" title="Tonjoo Forum" rel="friend">Tonjoo Forum</a>
+*if you have any questions,comment,customization request or suggestion please contact us via our [support forum](https://forum.tonjoostudio.com/thread-category/easy-custom-auto-excerpt/)
 
-Find more detail on our official plugin page : <a href="https://tonjoostudio.com/addons/easy-custom-auto-excerpt-premium/?utm_source=wp_org&utm_medium=link&utm_campaign=ecae" title="visit plugin site" rel="friend">Easy Custom Auto Excerpt</a>
+Find more detail on our official: <a href="https://tonjoostudio.com/product/easy-custom-auto-excerpt-premium/?utm_source=wp_org&utm_medium=link&utm_campaign=ecae" title="Easy Custom Auto Excerpt Premium" rel="friend">Easy Custom Auto Excerpt Premium</a>
 
 Or you can find our best plugins at <a href="https://tonjoostudio.com/" title="Tonjoo Studio" rel="friend">Tonjoo Studio</a>
 
@@ -102,6 +95,20 @@ It will used, instead of the automatically generated one.
 
 == Changelog ==
 
+= 2.3.3 =
+* Change admin menu position to root
+
+= 2.3.2 =
+* Fixing post type selection on advanced excerpt location
+* Fixing post editor error that affect for some users
+* Fixing page excerpt function
+
+= 2.3.1.5 =
+* Fixing backend UI after updated to WordPress 4.4
+
+= 2.3.1 =
+* Updated permalink
+
 = 2.3.0 =
 * Fixing google font http/https protocol
 * Fix known bugs
@@ -111,7 +118,7 @@ It will used, instead of the automatically generated one.
 * Fix known bugs
 
 = 2.2.8 =
-* Fixing issue with WPML 
+* Fixing issue with WPML
 * Fix known bugs
 
 = 2.2.7 =
@@ -203,14 +210,14 @@ It will used, instead of the automatically generated one.
 * Add readmore option
 
 = 1.0.7 =
-* Add spanish translation , thanks to Andrew Kurtis ~ webhostinghub.com 
+* Add spanish translation , thanks to Andrew Kurtis ~ webhostinghub.com
 * Better excerpt cropping algorithm
 
 = 1.0.6 =
 * Minor bug fix
 
 = 1.0.5 =
-* Add options to disable readmore. 
+* Add options to disable readmore.
 
 = 1.0.4 =
 * Fix remove / add image in excerpt option

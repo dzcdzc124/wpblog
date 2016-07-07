@@ -18,12 +18,14 @@ function tonjoo_ecae_options_page()
 {	
 	// add_plugin_page( $page_title, $menu_title, $capability, $menu_slug, $function);
 	
-	add_options_page( 
+	add_menu_page( 
 		__("Easy Custom Auto Excerpt Options Page",TONJOO_ECAE), 
 		'Excerpt', 
-		'moderate_comments', 
+		'moderate_comments', // editor
 		'tonjoo_excerpt', 
-		'tonjoo_ecae_options_do_page' );
+		'tonjoo_ecae_options_do_page',
+		'dashicons-text'
+	);
 }
 
 /**
@@ -97,15 +99,11 @@ function tonjoo_ecae_options_do_page()
 		/**
 		 * Redirect
 		 */
-		$location = admin_url("options-general.php?page=tonjoo_excerpt") . '&settings-updated=true';
+		$location = admin_url("admin.php?page=tonjoo_excerpt") . '&settings-updated=true';
 		echo "<meta http-equiv='refresh' content='0;url=$location' />";
 		echo "<h2>Loading...</h2>";
 		exit();
 	}
-
-	if (!current_user_can('moderate_comments')) {  
-		wp_die('You do not have sufficient permissions to access this page.');
-	} 
 
 	?>
 
@@ -113,13 +111,19 @@ function tonjoo_ecae_options_do_page()
 	<?php echo "<h2>".__("Easy Custom Auto Excerpt Options",TONJOO_ECAE)."</h2>"; ?>
 
 	<br>
+	
 	<?php _e("Easy Custom Auto Excerpt by",TONJOO_ECAE) ?> 
 	<a href='https://tonjoostudio.com' target="_blank">Tonjoo Studio</a> ~ 
-	<a href='https://tonjoostudio.com/addons/easy-custom-auto-excerpt-premium/?utm_source=upgrade&utm_medium=link&utm_campaign=ecae' target="_blank"><?php _e("Plugin Page",TONJOO_ECAE) ?></a> | 
 	<a href='http://wordpress.org/support/view/plugin-reviews/easy-custom-auto-excerpt?filter=5' target="_blank"><?php _e("Please Rate :)",TONJOO_ECAE) ?></a> |
 	<a href='http://wordpress.org/extend/plugins/easy-custom-auto-excerpt/' target="_blank"><?php _e("Comment",TONJOO_ECAE) ?></a> | 
-	<a href='https://forum.tonjoostudio.com' target="_blank"><?php _e("Bug Report",TONJOO_ECAE) ?></a> |
+	<a href='https://forum.tonjoostudio.com/thread-category/easy-custom-auto-excerpt/' target="_blank"><?php _e("Forum",TONJOO_ECAE) ?></a> |
 	<a href='https://tonjoostudio.com/addons/easy-custom-auto-excerpt/#faq' target="_blank"><?php _e("FAQ",TONJOO_ECAE) ?></a>
+	
+	<?php if(! function_exists('is_ecae_premium_exist')): ?>
+		<span style="width:10px;display:inline-block;"></span>
+		<a class="button btn-upgrade" href='http://wpexcerptplugin.com/' target="_blank">Upgrade To Premium</a>		
+	<?php endif; ?>
+
 	<br>
 	<br>
 
@@ -154,7 +158,7 @@ function tonjoo_ecae_options_do_page()
 		<!-- Extra style for options -->
 		<style>
 			.form-table td {
-				vertical-align: middle;
+				vertical-align: top;
 			}
 
 			.form-table th {
@@ -178,8 +182,11 @@ function tonjoo_ecae_options_do_page()
 
 			.meta-subtitle {
 			    margin: 0px -22px !important;
-			    border-top:1px solid rgb(238, 238, 238);
-			    background-color:#f6f6f6;
+				border-top: 1px solid #EEE;
+				border-bottom: 1px solid #EEE;
+				background-color: #F6F6F6;
+				padding: 10px;
+				font-size: 14px;		
 			}
 
 			@media (max-width: 767px) {
@@ -303,6 +310,8 @@ function tonjoo_ecae_options_do_page()
 
 						jQuery.ajax({url: url, dataType:'jsonp'}).done(function(data){
 							
+							console.log(data);
+
 							if(typeof data =='object')
 							{
 								var fristImg, fristUrl;
@@ -367,6 +376,15 @@ function tonjoo_ecae_options_do_page()
 								//promo_2
 								jQuery("#promo_2 img").attr("src",promoSecond['img']);
 								jQuery("#promo_2 a").attr("href",promoSecond['url']);
+
+								// if error
+								if(promoFirst['img'] == '') {
+									jQuery("#promo_1").hide();
+								}								
+								if(promoSecond['img'] == '') {
+									jQuery("#promo_2").hide();
+									jQuery("#promo_1").css('padding-bottom', '0');
+								}
 							}
 						});
 					});
@@ -376,12 +394,12 @@ function tonjoo_ecae_options_do_page()
 				<div class="inside" style="margin: 23px 10px 6px 10px;">
 					<div id="promo_1" style="text-align: center;padding-bottom:17px;">
 						<a href="https://tonjoostudio.com" target="_blank">
-							<img src="<?php echo plugins_url(HSCOMMENT_DIR_NAME."/assets/loading-big.gif") ?>" width="100%" alt="Tonjoo Studio">
+							<img src="<?php echo plugins_url(ECAE_DIR_NAME."/assets/loading-big.gif") ?>" width="100%" alt="Tonjoo Studio">
 						</a>
 					</div>
 					<div id="promo_2" style="text-align: center;">
 						<a href="https://tonjoostudio.com" target="_blank">
-							<img src="<?php echo plugins_url(HSCOMMENT_DIR_NAME."/assets/loading-big.gif") ?>" width="100%" alt="Tonjoo Studio">
+							<img src="<?php echo plugins_url(ECAE_DIR_NAME."/assets/loading-big.gif") ?>" width="100%" alt="Tonjoo Studio">
 						</a>
 					</div>
 				</div>
