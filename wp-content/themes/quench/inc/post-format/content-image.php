@@ -7,7 +7,7 @@
 			<li><i class="fa fa-clock-o"></i> <?php the_time('d,m,Y');?></li>
 			<li><?php echo'<i class="fa fa-pencil-square-o"></i> ';the_category(','); ?></li>
 			<li><i class="fa fa-comments-o"></i> <?php comments_popup_link('0 吐槽', '1 吐槽', '% 吐槽'); ?></li>
-			<li><i class="fa fa-eye"></i> <?php mzw_post_views(' Views');?></li>
+			<li><i class="fa fa-eye"></i> <?php mzw_post_views(' 浏览');?></li>
 		</ul>
     </header>
 	<div class="entry-image">

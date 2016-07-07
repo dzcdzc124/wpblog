@@ -13,7 +13,7 @@ get_header();
 		</h2>
 		<ul class="entry-meta">
 			<li><i class="fa fa-clock-o"></i> <?php the_time('d,m,Y');?></li>
-			<li><i class="fa fa-eye"></i> <?php mzw_post_views(' Views');?></li>
+			<li><i class="fa fa-eye"></i> <?php mzw_post_views(' 浏览');?></li>
 		</ul>
     </header>
     <div class="entry-content tags-page" itemprop="description">
