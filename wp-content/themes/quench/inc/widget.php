@@ -149,7 +149,7 @@ function mzw_posts_list($orderby,$limit,$cat) {
 		echo '<h3><a href="'.get_permalink().'">';
 		the_title();
 		echo '</a></h3><div class="post-meta"><span>';
-		comments_popup_link('No Reply', '1 Reply', '% Replies');
+		comments_popup_link('0 吐槽', '1 吐槽', '% 吐槽');
 		echo '</span> | <span>';
 		mzw_post_views(' Views');
 		echo '</span></div></div>';
