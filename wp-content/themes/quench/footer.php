@@ -36,5 +36,6 @@ wp_footer();
 <div style="display:none;">
 <script src="https://s11.cnzz.com/z_stat.php?id=1256538499&web_id=1256538499" language="JavaScript"></script>
 </div>
+<?php include_once "baidu_js_push.php" ?>
 </body>
 </html>
