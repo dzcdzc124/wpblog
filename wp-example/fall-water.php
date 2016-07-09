@@ -3,10 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="pragram" content="no-cache">
-    <title>彩带飘落</title>
+    <title></title>
 
     <style>
-      body{ background-color: #fefff2; margin: 0;}
+      body{ 
+        background-color: #5b97b9; margin: 0; overflow: hidden;
+        background-image:-webkit-linear-gradient(top, #b9cfda, #5b97b9);
+        background-image:linear-gradient(top,#b9cfda,#5b97b9);
+      }
     </style>
 </head>
 
@@ -75,16 +79,18 @@
         function lightFall( element ){
           this.canvas = document.getElementById(element);
           this.ctx = this.canvas.getContext("2d");
-          this.colors = [];
-          this.lines = [];
+          this.bigbooms = [];
           this.animateId = null;
           this.isEnd = false;
-          this.lastTime_color = new Date();
-          this.lastTime_line = new Date();
+          this.lastTime = new Date();
 
-          this.fallDuration = 150;
+          this.fallDuration = 250;
           this.minDuration = 30;
+          //爆炸线
+          this.boomLine = this.canvas.height * 0.8;
 
+          //y轴方向加速度
+          this.avy = 0.1;
 
           this.start();
         }
@@ -95,48 +101,50 @@
         lightFall.prototype.animate = function(){
           var self = this;
 
+          self.ctx.save();
+          //透明度0.02是出现boom和frag轨迹的关键
+          var img = new Image();
+          self.ctx.globalCompositeOperation = "destination-out";        
+          self.ctx.fillStyle = "rgba(0,0,0,.02)";
+          self.ctx.fillRect(0,0,canvas.width,canvas.height);
+          self.ctx.restore();
+
           var newTime = new Date();
 
-          if(newTime-self.lastTime_color>this.fallDuration && !self.isEnd && self.colors.length<40){  //频率
+          if(newTime-self.lastTime>this.fallDuration && !self.isEnd){  //频率
+            //var num = getRandom(2,3);
             var num = 2;
 
             for(var i = 0; i<num; i++){
-              var c = new Colors(self.canvas);
-              self.colors.push(c);
+              var x = getRandom(self.canvas.width/6,self.canvas.width*5/6);
+              //var r = getRandom(2,3);
+              var bigboom = new Boom(self.canvas, x, 2, "#FFFFFF", self.avy, self.boomLine);
+              self.bigbooms.push(bigboom);
             }
             
-            self.lastTime_color = newTime;
-          }
-          if(newTime-self.lastTime_line > this.fallDuration*4 && !self.isEnd && self.lines.length<5){  //频率
-            var num = 1;
-
-            var line = new Line(self.canvas);
-            self.lines.push(line);
-            
-            self.lastTime_line = newTime;
+            self.lastTime = newTime;
+            if(this.fallDuration > this.minDuration){
+              this.fallDuration -= 10;
+            }
           }
 
-          self.ctx.clearRect(0,0,canvas.width,canvas.height);
-          self.colors.foreach(function(index){
+          self.bigbooms.foreach(function(index){
             var that = this;
             if(!that.dead){
               that._move();
             }
             else{
-              self.colors.splice(self.colors.indexOf(that),1);
+              that.booms.foreach(function(index){
+                if(!this.dead) {
+                  this._move();
+                }
+                else if(index === that.booms.length-1){
+                  self.bigbooms.splice(self.bigbooms.indexOf(that),1);
+                }
+              })
             }
           });
           
-          self.lines.foreach(function(index){
-            var that = this;
-            if(!that.dead){
-              that._move();
-            }
-            else{
-              self.lines.splice(self.lines.indexOf(that),1);
-            }
-          });
-
           self.animateId = requestAnimationFrame((function(_this){
             return function(){
               _this.animate.call(_this);
@@ -150,138 +158,117 @@
           self.ctx.clearRect(0,0,canvas.width,canvas.height);
         }
 
-        function Colors (canvas){
+        function Boom (canvas,x,r,c,avy, boomLine){
           this.canvas = canvas;
           this.ctx = this.canvas.getContext("2d");
-
-          var type = getRandom(-2,8);
-
-          this.type = type;
-          if(type < 0){
-            this.x = getRandom(0, canvas.width);
-            this.y = getRandom(0, canvas.height);
-            this.vx = getRandom(-3,3);
-            this.vy = getRandom(-1,3);
-          }else{
-            this.x = getRandom(0, canvas.width);
-            this.y = -10;
-            this.vx = getRandom(-2,2);
-            this.vy = getRandom(3,7);
-          }
-
-          var color = ["#fcda8c","#a8cfb7","#e5bc8b","#a3dbd4","#f4d383","#5057df","#db4444"];
-          this.c = color[getRandom(0,color.length-1)];
-
-          var size = 15;
-          this.path =[];    //不规则多边形路径
-          var num = getRandom(2,5);
-          for(var i = 0; i<num; i++){
-            var _x = getRandom(-size, size);
-            var _y = getRandom(-size, size);
-            this.path.push({x:_x, y: _y});
-          }
+          this.booms = [];
+          this.l = 50;
+          this.x = x;
+          this.y = -r-this.l;
+          this.r = r;
+          this.c = c;
+          this.vy = getRandom(10, 12);
 
           //加速度
-          this.fadeout = false;
+          this.avy = avy;
+          this.vx = 0;
           this.dead = false;
 
+          this.boomLine = boomLine;
+          this.isHit= false;
           this.alpha = 1;
-          var reduce = getRandom(0,3);
-          this.reduce = 0.93+reduce/100;
+          this.reduce = 0.97;
+
+          this.count = 0;
         }
-        Colors.prototype = {
+        Boom.prototype = {
           _paint:function(){
             this.ctx.save();
             this.ctx.beginPath();
-            if(this.fadeout){
-              this.ctx.globalAlpha = this.alpha;
-            }
-
             this.ctx.fillStyle = this.c;
-            this.ctx.moveTo(this.x, this.y);
-            for(var i = 0; i<this.path.length; i++){
-              this.ctx.lineTo(this.x+this.path[i].x, this.y+this.path[i].y);
-            }
-            this.ctx.closePath();
+            this.ctx.fillRect(this.x, this.y, this.r, this.l)
             this.ctx.fill();
             this.ctx.restore();
           },
           _move:function(){
-            if(this.fadeout){
-              this.alpha *= this.reduce;
-            }
+            this.vy += this.avy;
 
-            this.x = this.x + this.vx;
+            if( this.y < this.boomLine && this.y + this.vy > this.boomLine && !this.isHit){
+              var rand = getRandom(0,10);
+              if( rand > 6 ){
+                this._boom();
+                this.dead = true;
+                return;
+              }
+            }
+            
             this.y = this.y + this.vy;
 
-            var r;
-            if(this.type < 0){
-              r = getRandom(0 ,40);
-            }else{
-              r = getRandom(0 ,70);
-            }
-            if(!r){ this.fadeout = true; }
+            this.x = this.x + this.vx;
 
-            //碎屑退出条件
-            if( this.y > canvas.height + 10 ||
-                this.y < -10 ||
-                this.x > canvas.width + 10 ||
-                this.x < -10 ||
-                this.alpha < 0.05
-              ){
-              
+
+            if(this.y > canvas.height + 10){
               this.dead = true;
             }
             else {
               this._paint();
             }
           },
+          _boom:function(){
+            var fragNum = getRandom(5 , 9);
+            var basevx = getRandom(-4,4,1);
+            var basevy = getRandom(-this.vy*0.3, this.vy*0.1, 1);
+            for(var i=0;i<fragNum;i++){
+              var radius = 1.6;    //花半径
+              var vx = getRandom(basevx-1,basevx+1,1);
+              var vy = getRandom(basevy-0.4,basevy+0.4,1);
+              var frag = new Frag(this.canvas, this.x , this.y+this.l , radius , this.c , vx, vy, this.avy);
+              this.booms.push(frag);
+            }
+            
+          },
         }
 
-        function Line (canvas){
+        function Frag(canvas, centerX , centerY , radius , color , vx , vy, avy){
           this.canvas = canvas;
           this.ctx = this.canvas.getContext("2d");
-
-          this.length = getRandom( 200 , 300);
-          this.x = getRandom(0, canvas.width+(canvas.height*2/3));
-          this.y = 0;
-          this.vx = -8;
-          this.vy = 12;
-          
-          this.c = "#ff7392";
-
-          //加速度
+          this.x = centerX;
+          this.y = centerY;
           this.dead = false;
+          this.radius = radius;
+          this.color = color;
+          this.vx = vx;
+          this.vy = vy;
+          this.avy = avy;
+          this.alpha = 1;
+          this.reduce = 0.95;
         }
-        Line.prototype = {
+        Frag.prototype = {
           _paint:function(){
             this.ctx.save();
             this.ctx.beginPath();
-
-            this.ctx.strokeStyle = this.c;
-            this.ctx.lineWidth = 2;
-            this.ctx.lineCap = "round";
-            this.ctx.moveTo(this.x, this.y);
-            this.ctx.lineTo(this.x+this.length/3, this.y-this.length/2);
-            this.ctx.stroke();
-
-            this.ctx.closePath();
+            this.ctx.globalAlpha = this.alpha;
+            this.ctx.arc(this.x , this.y , this.radius , 0 , 2*Math.PI);
+            this.ctx.fillStyle = this.color;
+            this.ctx.fill()
             this.ctx.restore();
           },
-          _move:function(){
-            this.x = this.x + this.vx;
+          _move: function(){
+            this.vy += this.avy;
+
             this.y = this.y + this.vy;
 
-            //退出条件
-            if( this.y > canvas.height + this.length/2 ||
-                this.x < -this.length/3
-            ){
+            this.x = this.x + this.vx;
+
+            this.alpha *= this.reduce;
+
+            if(this.y > canvas.height + 10 || this.alpha < 0.1){
               this.dead = true;
             }
             else {
               this._paint();
             }
-          },
+          }
         }
     </script>
 
