@@ -1,7 +1,7 @@
         </div>
         <footer id="footer" class="yahei clearfix"><div id="footer_in">
         	<p class="f_bq left" style="margin-top: 10px;">
-        		<a style="cursor: pointer; text-decoration: underline;" target="_blank" href="www.miitbeian.gov.cn">【 粤ICP备15063814号 】</a>
+        		<a style="cursor: pointer; text-decoration: underline;" target="_blank" href="http://www.miitbeian.gov.cn">【 粤ICP备15063814号 】</a>
         	</p>
 
 			<p class="f_bq right"> <?php if($word_t2!=""){echo $word_t2;}else{echo '版权所有';}  ?> &copy;<?php echo date("Y"); echo " "; bloginfo('name'); 
