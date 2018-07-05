@@ -287,7 +287,7 @@
 
 
 <?php 
-  if( strpos(strtolower($_SERVER['HTTP_HOST']), "toucanz") !== FALSE ){
+  if( !$develop ){
     include_once("footer.php");
   }
 ?>

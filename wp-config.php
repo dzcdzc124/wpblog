@@ -21,7 +21,7 @@
 // ** MySQL 设置 - 具体信息来自您正在使用的主机 ** //
 /** WordPress数据库的名称 */
 
-//如果域名不带toucanz或服务器IP地址，则为开发模式
+//如果域名不带dantis或服务器IP地址，则为开发模式
 $develop = !(strpos(strtolower($_SERVER["HTTP_HOST"]),"dantis")!==false || strpos($_SERVER["HTTP_HOST"],"120.77.153.194")!==false);
 define('DEVELOP', $develop);
 
