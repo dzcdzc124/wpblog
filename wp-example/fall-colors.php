@@ -287,9 +287,7 @@
 
 
 <?php 
-  if( !$develop ){
     include_once("footer.php");
-  }
 ?>
 </body>
 </html>
