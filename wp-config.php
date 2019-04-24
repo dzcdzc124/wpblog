@@ -22,7 +22,7 @@
 /** WordPress数据库的名称 */
 
 //如果域名不带dantis或服务器IP地址，则为开发模式
-$develop = !(strpos(strtolower($_SERVER["HTTP_HOST"]),"dantis")!==false || strpos($_SERVER["HTTP_HOST"],"120.77.153.194")!==false);
+$develop = !(strpos(strtolower($_SERVER["HTTP_HOST"]),"dantis")!==false);
 define('DEVELOP', $develop);
 
 define('DB_NAME', DEVELOP?'wordpress':'wordpress');
